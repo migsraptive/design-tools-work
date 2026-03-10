@@ -24,30 +24,31 @@ export default function CreatorToolsControlsPage() {
                 Project Drop
               </Badge>
               <Badge variant="outline" className="rounded-full px-3 py-1">
-                Controls
+                Legacy Subsurface
               </Badge>
             </div>
             <div>
               <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-                Post & Community Controls
+                Publishing Controls
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Static control center for scheduling, pinning, moderation, and team
-                publishing with clear creator disclosure.
+                Execution tools for scheduling, pinning, moderation, and delegated
+                publishing. In the new IA, this surface supports actions rather than
+                leading the workflow.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/drops/creator-tools">
+              <Link href="/drops/creator-tools/actions">
                 <ArrowLeft className="size-4" />
-                Back to Analytics
+                Back to Actions
               </Link>
             </Button>
             <Button asChild variant="outline" className="rounded-full">
-              <Link href="/drops/creator-tools/nudges">
-                Next: Nudges
+              <Link href="/drops/creator-tools/actions">
+                Open Actions
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -64,15 +65,14 @@ export default function CreatorToolsControlsPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                   <CalendarClock className="size-4 text-primary" />
-                  Publishing controls
+                  Execution tools
                 </div>
                 <h2 className="text-2xl font-black tracking-tight md:text-3xl">
-                  Reduce creator overhead without losing trust
+                  Operational Controls
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Scheduling, pinning, and team-assisted posting are organized around
-                  approval and disclosure so creators stay in control without doing every
-                  task manually.
+                  Use these controls after the priority has been identified. This surface
+                  handles execution, approval, and placement.
                 </p>
               </div>
 

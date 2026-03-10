@@ -18,24 +18,25 @@ export default function CreatorToolsNudgesPage() {
                 Project Drop
               </Badge>
               <Badge variant="outline" className="rounded-full px-3 py-1">
-                Nudges
+                Legacy Subsurface
               </Badge>
             </div>
             <div>
               <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-                AI-Driven Engagement Nudges
+                Response Prompts
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Mock inbox and configuration surfaces showing how creator nudges can stay
-                specific, actionable, and low-noise.
+                Supporting execution surface for response prompts and timing cues. In the
+                new IA, these recommendations sit inside Actions rather than as a primary
+                navigation category.
               </p>
             </div>
           </div>
 
           <Button asChild variant="outline" className="rounded-full">
-            <Link href="/drops/creator-tools/controls">
+            <Link href="/drops/creator-tools/actions">
               <ArrowLeft className="size-4" />
-              Back to Controls
+              Back to Actions
             </Link>
           </Button>
         </div>
@@ -50,14 +51,14 @@ export default function CreatorToolsNudgesPage() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                   <BellRing className="size-4 text-primary" />
-                  Engagement assistant
+                  Action suggestions
                 </div>
                 <h2 className="text-2xl font-black tracking-tight md:text-3xl">
-                  Help creators show up at the right moment
+                  Timely Response Signals
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  The system prioritizes urgency and specificity, then lets creators tune
-                  cadence so nudges feel like a trusted assistant instead of noise.
+                  These prompts translate active conversation signals into timely response
+                  opportunities and publishing follow-through.
                 </p>
               </div>
 

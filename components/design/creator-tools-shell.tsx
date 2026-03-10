@@ -10,7 +10,7 @@ export function CreatorToolsShell({
   title,
   description,
   backHref = "/drops/creator-tools",
-  backLabel = "Back to Analytics",
+  backLabel = "Back to Overview",
   children,
 }: {
   badge: string;

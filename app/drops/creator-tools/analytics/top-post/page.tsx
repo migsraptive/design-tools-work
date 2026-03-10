@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 export default function CreatorToolsTopPostPage() {
   return (
     <CreatorToolsShell
-      badge="Analytics Detail"
-      title="Top Post Performance"
-      description="Mock drill-in for the highest-performing community post, showing why it is resonating and what the creator should do next."
+      badge="Thread Detail"
+      title="Breakout Thread"
+      description="A thread-level read on the conversation carrying the most community momentum this week."
+      backHref="/drops/creator-tools/threads"
+      backLabel="Back to Threads"
     >
       <section className="overflow-hidden rounded-[32px] border border-border/70 bg-card shadow-sm">
         <div className="border-b border-border/60 px-6 py-5 md:px-8">
@@ -15,18 +17,18 @@ export default function CreatorToolsTopPostPage() {
             <div>
               <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                 <BarChart3 className="size-4 text-primary" />
-                Post detail
+                Evidence layer
               </div>
               <h2 className="mt-2 text-2xl font-black tracking-tight">
-                How I batch a week of dinners in 90 minutes
+                Breakout Thread Performance
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                This thread is outperforming the rest of the week on both pageviews and
-                sustained comment depth.
+                This thread is carrying the strongest share of current community momentum
+                and still contains unresolved response opportunities.
               </p>
             </div>
             <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Top post this week
+              Top thread this week
             </Badge>
           </div>
         </div>

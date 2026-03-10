@@ -45,7 +45,8 @@ export default function CreatorToolsPrdPage() {
               Creator Tools PRD
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Supporting product reference for the prototype route.
+              Internal product reference. This document is intentionally outside the
+              primary creator-tools navigation.
             </p>
           </div>
         </div>
