@@ -5,6 +5,18 @@ import * as RechartsPrimitive from "recharts"
 
 import { cn } from "@/lib/utils"
 
+type ChartPayloadItem = {
+  type?: string
+  name?: string
+  dataKey?: string | number
+  value?: number | string
+  color?: string
+  payload?: {
+    fill?: string
+    [key: string]: unknown
+  }
+}
+
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
@@ -173,9 +185,9 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
-        {payload
-          .filter((item: any) => item.type !== "none")
-          .map((item: any, index: number) => {
+        {(payload as ChartPayloadItem[])
+          .filter((item) => item.type !== "none")
+          .map((item, index: number) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
             const indicatorColor = color || item.payload.fill || item.color
@@ -252,8 +264,13 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}: any) {
+}: {
+  className?: string
+  hideIcon?: boolean
+  payload?: ChartPayloadItem[]
+  verticalAlign?: "top" | "bottom"
+  nameKey?: string
+}) {
   const { config } = useChart()
 
   if (!payload?.length) {
@@ -269,8 +286,8 @@ function ChartLegendContent({
       )}
     >
       {payload
-        .filter((item: any) => item.type !== "none")
-        .map((item: any) => {
+        .filter((item) => item.type !== "none")
+        .map((item) => {
           const key = `${nameKey || item.dataKey || "value"}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 

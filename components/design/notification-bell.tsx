@@ -60,7 +60,20 @@ export function NotificationBell({ expanded }: { expanded: boolean }) {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
+    async function loadNotifications() {
+      try {
+        const vid = getVoterId();
+        const res = await fetch(`/api/design/notifications?limit=20&voterId=${encodeURIComponent(vid)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      } catch {
+        // silently fail
+      }
+    }
+
+    void loadNotifications();
     intervalRef.current = setInterval(fetchNotifications, 30_000);
     return () => clearInterval(intervalRef.current);
   }, [fetchNotifications]);

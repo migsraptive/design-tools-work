@@ -6,12 +6,10 @@ import Link from "next/link";
 import {
   ArrowLeft,
   ChevronDown,
-  ImagePlus,
   Loader2,
   Plus,
   Sparkles,
   Users,
-  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";

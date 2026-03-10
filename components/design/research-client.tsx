@@ -19,7 +19,6 @@ import {
   AlertTriangle,
   HelpCircle,
   Lightbulb,
-  Gauge,
   CheckCircle2,
   Zap,
   Plus,
@@ -117,7 +116,7 @@ interface Props {
 
 export function ResearchClient({ batch: initialBatch }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
-  const [batch, setBatch] = useState(initialBatch);
+  const batch = initialBatch;
   const [seeding, setSeeding] = useState(false);
 
   async function handleSeedDemo() {
@@ -1208,11 +1207,13 @@ function SegmentCard({ segment }: { segment: Segment }) {
     setLoading(false);
   }, [segment.id]);
 
-  useEffect(() => {
-    if (expanded && items.length === 0) {
-      fetchItems();
+  async function handleToggle() {
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    if (nextExpanded && items.length === 0) {
+      await fetchItems();
     }
-  }, [expanded, items.length, fetchItems]);
+  }
 
   const bucketCounts: Partial<Record<Bucket, number>> = {};
   for (const item of items) {
@@ -1223,7 +1224,9 @@ function SegmentCard({ segment }: { segment: Segment }) {
     <Card>
       <CardContent className="p-0">
         <button
-          onClick={() => setExpanded(!expanded)}
+          onClick={() => {
+            void handleToggle();
+          }}
           className="w-full flex items-center gap-3 p-4 text-left hover:bg-muted/50 transition-colors"
         >
           {expanded ? (
@@ -1328,8 +1331,25 @@ function SegmentsTab() {
   }, []);
 
   useEffect(() => {
-    fetchSegments();
-  }, [fetchSegments]);
+    let cancelled = false;
+
+    async function loadSegments() {
+      const res = await fetch("/api/design/research/segments");
+      if (!res.ok || cancelled) {
+        if (!cancelled) setLoading(false);
+        return;
+      }
+
+      setSegments(await res.json());
+      setLoading(false);
+    }
+
+    void loadSegments();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="space-y-6">

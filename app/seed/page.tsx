@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -330,12 +331,9 @@ export default function SeedPage() {
         <div className="text-center space-y-2">
           <p className="text-destructive font-medium">Seed failed</p>
           <p className="text-sm text-muted-foreground">{error}</p>
-          <a
-            href="/"
-            className="text-sm text-primary hover:underline"
-          >
+          <Link href="/" className="text-sm text-primary hover:underline">
             Home
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="flex items-center gap-3">

@@ -76,6 +76,7 @@ export function OptionForm({ value, onChange, titlePlaceholder = "Option title" 
       {/* Image attach */}
       {hasImage ? (
         <div className="relative rounded-lg overflow-hidden border">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value.mediaUrl} alt="" className="w-full max-h-48 object-cover" />
           <button
             type="button"

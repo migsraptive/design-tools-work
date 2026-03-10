@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import type { MediaType } from "@/lib/design-types";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
