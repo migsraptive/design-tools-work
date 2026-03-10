@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { BellRing, CalendarClock, Pin, ShieldCheck } from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { SectionFeedback } from "@/components/design/section-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +12,7 @@ import {
   pinnedPosts,
   scheduledPosts,
 } from "@/lib/mock/creator-tools";
+import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
 
 export default function CreatorToolsActionsPage() {
   return (
@@ -41,17 +43,24 @@ export default function CreatorToolsActionsPage() {
             </p>
             <div className="mt-4 space-y-3">
               {actionQueue.map((item) => (
-                <Link
+                <div
                   key={item.title}
-                  href={item.href}
-                  className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
+                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                 >
-                  <p className="text-sm font-semibold">{item.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.note}</p>
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                    {item.source}
-                  </p>
-                </Link>
+                  <Link href={item.href} className="block transition-colors hover:text-foreground">
+                    <p className="text-sm font-semibold">{item.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.note}</p>
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                      {item.source}
+                    </p>
+                  </Link>
+                  <SectionFeedback
+                    page="actions"
+                    targetType="action"
+                    targetId={creatorToolsFeedbackId("actions", "action", item.title)}
+                    className="mt-4"
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -68,7 +77,7 @@ export default function CreatorToolsActionsPage() {
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button asChild size="sm" variant="secondary">
                   <Link href="/drops/creator-tools/nudges/high-signal-question">
-                    Open top action
+                    Open response opportunity
                   </Link>
                 </Button>
                 <Button
@@ -77,7 +86,7 @@ export default function CreatorToolsActionsPage() {
                   variant="outline"
                   className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
                 >
-                  <Link href="/drops/creator-tools/controls/scheduler">Open scheduler</Link>
+                  <Link href="/drops/creator-tools/controls/scheduler">Open publishing controls</Link>
                 </Button>
               </div>
             </div>
@@ -87,22 +96,29 @@ export default function CreatorToolsActionsPage() {
                 Response Opportunities
               </p>
               <div className="mt-4 space-y-3">
-                {nudgeInbox.map((item) => (
-                  <Link
+              {nudgeInbox.map((item) => (
+                  <div
                     key={item.title}
-                    href={item.href}
-                    className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
+                    className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                   >
-                    <div className="flex items-center justify-between gap-3">
-                      <Badge variant="outline" className="rounded-full px-3 py-1">
-                        {item.type}
-                      </Badge>
-                      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                        {item.priority}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm font-semibold">{item.title}</p>
-                  </Link>
+                    <Link href={item.href} className="block transition-colors hover:text-foreground">
+                      <div className="flex items-center justify-between gap-3">
+                        <Badge variant="outline" className="rounded-full px-3 py-1">
+                          {item.type}
+                        </Badge>
+                        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                          {item.priority}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm font-semibold">{item.title}</p>
+                    </Link>
+                    <SectionFeedback
+                      page="actions"
+                      targetType="action"
+                      targetId={creatorToolsFeedbackId("actions", "action", item.title)}
+                      className="mt-4"
+                    />
+                  </div>
                 ))}
               </div>
             </div>

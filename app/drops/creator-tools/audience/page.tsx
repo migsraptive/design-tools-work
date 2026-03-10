@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, Users } from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { SectionFeedback } from "@/components/design/section-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { audienceSegments } from "@/lib/mock/creator-tools";
+import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
 
 export default function CreatorToolsAudiencePage() {
   return (
@@ -30,7 +32,7 @@ export default function CreatorToolsAudiencePage() {
             </div>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/drops/creator-tools/threads">
-                Next: Threads
+                View Conversation Signals
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -52,7 +54,7 @@ export default function CreatorToolsAudiencePage() {
                 </div>
                 <div className="rounded-2xl border border-border/60 bg-secondary/25 px-4 py-3 text-right">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Size
+                    Segment size
                   </p>
                   <p className="mt-1 text-2xl font-black">{segment.size}</p>
                 </div>
@@ -64,14 +66,20 @@ export default function CreatorToolsAudiencePage() {
 
               <div className="mt-5 flex flex-wrap gap-3">
                 <Button asChild size="sm" variant="secondary">
-                  <Link href={segment.relatedThreadHref}>Inspect supporting thread</Link>
+                  <Link href={segment.relatedThreadHref}>View supporting thread</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                   <Link href={segment.relatedThemeHref}>
-                    Related theme: {segment.relatedTheme}
+                    Theme signal: {segment.relatedTheme}
                   </Link>
                 </Button>
               </div>
+              <SectionFeedback
+                page="audience"
+                targetType="audience_segment"
+                targetId={creatorToolsFeedbackId("audience", "audience_segment", segment.label)}
+                className="mt-4"
+              />
             </div>
           ))}
         </div>

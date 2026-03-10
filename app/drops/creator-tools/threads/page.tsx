@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, MessageSquareQuote } from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { SectionFeedback } from "@/components/design/section-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { threadSignals, topPosts } from "@/lib/mock/creator-tools";
+import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
 
 export default function CreatorToolsThreadsPage() {
   return (
@@ -30,7 +32,7 @@ export default function CreatorToolsThreadsPage() {
             </div>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/drops/creator-tools/actions">
-                Next: Actions
+                View Priority Actions
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
@@ -44,42 +46,56 @@ export default function CreatorToolsThreadsPage() {
             </p>
             <div className="mt-4 space-y-3">
               {threadSignals.map((thread) => (
-                <Link
+                <div
                   key={thread.title}
-                  href={thread.href}
-                  className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
+                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                 >
-                  <Badge variant="outline" className="rounded-full px-3 py-1">
-                    {thread.signal}
-                  </Badge>
-                  <p className="mt-3 text-sm font-semibold">{thread.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{thread.body}</p>
-                </Link>
+                  <Link href={thread.href} className="block transition-colors hover:text-foreground">
+                    <Badge variant="outline" className="rounded-full px-3 py-1">
+                      {thread.signal}
+                    </Badge>
+                    <p className="mt-3 text-sm font-semibold">{thread.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{thread.body}</p>
+                  </Link>
+                  <SectionFeedback
+                    page="threads"
+                    targetType="thread"
+                    targetId={creatorToolsFeedbackId("threads", "thread", thread.title)}
+                    className="mt-4"
+                  />
+                </div>
               ))}
             </div>
           </div>
 
           <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Top posts and threads
+              Leading threads
             </p>
             <div className="mt-4 space-y-3">
               {topPosts.map((post, index) => (
-                <Link
+                <div
                   key={post.title}
-                  href={post.href}
-                  className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
+                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold">{post.title}</p>
-                    <Badge variant="outline" className="rounded-full px-3 py-1 text-[10px]">
-                      #{index + 1}
-                    </Badge>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {post.views.toLocaleString()} views • {post.engagement}% engagement
-                  </p>
-                </Link>
+                  <Link href={post.href} className="block transition-colors hover:text-foreground">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">{post.title}</p>
+                      <Badge variant="outline" className="rounded-full px-3 py-1 text-[10px]">
+                        #{index + 1}
+                      </Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {post.views.toLocaleString()} views • {post.engagement}% engagement
+                    </p>
+                  </Link>
+                  <SectionFeedback
+                    page="threads"
+                    targetType="thread"
+                    targetId={creatorToolsFeedbackId("threads", "thread", post.title)}
+                    className="mt-4"
+                  />
+                </div>
               ))}
             </div>
           </div>

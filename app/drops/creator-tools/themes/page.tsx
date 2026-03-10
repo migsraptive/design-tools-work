@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { SectionFeedback } from "@/components/design/section-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { themes } from "@/lib/mock/creator-tools";
+import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
 
 export default function CreatorToolsThemesPage() {
   return (
@@ -30,14 +32,14 @@ export default function CreatorToolsThemesPage() {
             </div>
             <Button asChild variant="outline" className="rounded-full">
               <Link href="/drops/creator-tools/audience">
-                Next: Audience
+                View Audience Signals
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-4 p-6 md:p-8">
+        <div className="grid gap-4 p-6 md:grid-cols-2 md:p-8">
           {themes.map((item, index) => (
             <div
               key={item.theme}
@@ -63,7 +65,7 @@ export default function CreatorToolsThemesPage() {
                 </div>
                 <div className="rounded-2xl border border-border/60 bg-secondary/25 px-4 py-3 text-right">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Momentum
+                    Theme score
                   </p>
                   <p className="mt-1 text-2xl font-black">{item.momentum}</p>
                 </div>
@@ -71,14 +73,20 @@ export default function CreatorToolsThemesPage() {
 
               <div className="mt-5 flex flex-wrap gap-3">
                 <Button asChild size="sm" variant="secondary">
-                  <Link href={item.relatedThreadHref}>View supporting threads</Link>
+                  <Link href={item.relatedThreadHref}>View conversation signals</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                   <Link href={item.relatedAudienceHref}>
-                    Related audience: {item.relatedAudience}
+                    Audience signal: {item.relatedAudience}
                   </Link>
                 </Button>
               </div>
+              <SectionFeedback
+                page="themes"
+                targetType="theme"
+                targetId={creatorToolsFeedbackId("themes", "theme", item.theme)}
+                className="mt-4"
+              />
             </div>
           ))}
         </div>

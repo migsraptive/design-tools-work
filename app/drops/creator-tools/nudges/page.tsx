@@ -90,7 +90,7 @@ export default function CreatorToolsNudgesPage() {
               <div className="flex items-center gap-2">
                 <MessageSquareQuote className="size-4 text-primary" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Nudge inbox
+                  Response queue
                 </p>
               </div>
               <div className="mt-5 space-y-3">
@@ -111,7 +111,7 @@ export default function CreatorToolsNudgesPage() {
                     <p className="mt-3 text-sm font-semibold">{item.title}</p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
                     <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                      Open detail
+                      View signal
                     </p>
                   </Link>
                 ))}
@@ -120,9 +120,9 @@ export default function CreatorToolsNudgesPage() {
 
             <div className="space-y-4">
               <div className="rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-                  Digest preview
-                </p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
+                Digest summary
+              </p>
                 <div className="mt-4 rounded-2xl border border-primary-foreground/15 bg-black/10 p-4">
                   <div className="flex items-center gap-2 text-sm font-semibold">
                     <Mail className="size-4" />
@@ -135,10 +135,10 @@ export default function CreatorToolsNudgesPage() {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button asChild size="sm" variant="secondary">
-                    <Link href="/drops/creator-tools/nudges/high-signal-question">Open top nudge</Link>
+                    <Link href="/drops/creator-tools/nudges/high-signal-question">Open leading signal</Link>
                   </Button>
                   <Button asChild size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                    <Link href="/drops/creator-tools/controls/scheduler">Turn into scheduled post</Link>
+                    <Link href="/drops/creator-tools/controls/scheduler">Convert to scheduled post</Link>
                   </Button>
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function CreatorToolsNudgesPage() {
                 <div className="flex items-center gap-2">
                   <Settings2 className="size-4 text-primary" />
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Preferences
+                    Delivery preferences
                   </p>
                 </div>
                 <div className="mt-5 space-y-3">

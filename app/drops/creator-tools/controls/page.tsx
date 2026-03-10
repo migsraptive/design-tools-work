@@ -63,7 +63,7 @@ export default function CreatorToolsControlsPage() {
           <div className="border-b border-border/60 px-6 py-5 md:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                   <CalendarClock className="size-4 text-primary" />
                   Execution tools
                 </div>
@@ -104,7 +104,7 @@ export default function CreatorToolsControlsPage() {
               <div className="flex items-center gap-2">
                 <CalendarClock className="size-4 text-primary" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Scheduled queue
+                  Publishing queue
                 </p>
               </div>
               <div className="mt-5 space-y-3">
@@ -128,7 +128,7 @@ export default function CreatorToolsControlsPage() {
 
             <div className="rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-                Team posting policy
+                Delegated publishing
               </p>
               <p className="mt-3 text-lg font-bold leading-7">
                 Posts can go out as the creator, but the UI always shows “Posted by Team”
@@ -145,7 +145,7 @@ export default function CreatorToolsControlsPage() {
                   <Link href="/drops/creator-tools/controls/team-review">Review team draft</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                  <Link href="/drops/creator-tools/controls/scheduler">Open scheduler</Link>
+                  <Link href="/drops/creator-tools/controls/scheduler">Open scheduling</Link>
                 </Button>
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function CreatorToolsControlsPage() {
               <div className="flex items-center gap-2">
                 <Pin className="size-4 text-primary" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Pinned posts
+                  Pinned placement
                 </p>
               </div>
               <div className="mt-5 space-y-3">
@@ -173,7 +173,7 @@ export default function CreatorToolsControlsPage() {
               <div className="flex items-center gap-2">
                 <ShieldCheck className="size-4 text-primary" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Moderation actions
+                  Moderation queue
                 </p>
               </div>
               <div className="mt-5 space-y-3">
@@ -190,7 +190,7 @@ export default function CreatorToolsControlsPage() {
               <div className="flex items-center gap-2">
                 <Users className="size-4 text-primary" />
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Weekly calendar
+                  Publishing calendar
                 </p>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">

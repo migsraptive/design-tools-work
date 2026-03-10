@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, Pie, PieChart, Cell, XAxis } from "recharts";
 import { CreatorToolsPrototypeNav } from "@/components/design/creator-tools-prototype-nav";
+import { SectionFeedback } from "@/components/design/section-feedback";
 import { FadeIn } from "@/components/motion/fade-in";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import {
   threadSignals,
   trafficSources,
 } from "@/lib/mock/creator-tools";
+import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
 
 const trendConfig = {
   pageviews: { label: "Pageviews", color: "#111827" },
@@ -65,7 +67,7 @@ export default function CreatorToolsDropPage() {
 
           <Button asChild variant="outline" className="rounded-full">
             <Link href="/drops/creator-tools/themes">
-              Go to Themes
+              View Theme Signals
               <ArrowRight className="size-4" />
             </Link>
           </Button>
@@ -95,7 +97,7 @@ export default function CreatorToolsDropPage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 <Badge variant="secondary" className="rounded-full px-3 py-1">
-                  7-day view
+                  Weekly view
                 </Badge>
                 <Badge variant="outline" className="rounded-full px-3 py-1">
                   Mock data
@@ -132,6 +134,12 @@ export default function CreatorToolsDropPage() {
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                       {finding.cta}
                     </p>
+                    <SectionFeedback
+                      page="overview"
+                      targetType="finding"
+                      targetId={creatorToolsFeedbackId("overview", "finding", finding.title)}
+                      className="mt-4"
+                    />
                   </Link>
                 ))}
               </div>
@@ -162,6 +170,12 @@ export default function CreatorToolsDropPage() {
                   <Link href="/drops/creator-tools/actions">See actions</Link>
                 </Button>
               </div>
+              <SectionFeedback
+                page="overview"
+                targetType="opportunity"
+                targetId={creatorToolsFeedbackId("overview", "opportunity", "Primary Opportunity")}
+                className="mt-4 border-white/15 bg-black/10"
+              />
             </div>
           </div>
 
@@ -239,18 +253,25 @@ export default function CreatorToolsDropPage() {
                   </p>
                 </div>
                 <div className="mt-4 space-y-3">
-                  {threadSignals.slice(0, 2).map((thread) => (
-                    <Link
-                      key={thread.title}
-                      href={thread.href}
-                      className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
-                    >
+                {threadSignals.slice(0, 2).map((thread) => (
+                  <div
+                    key={thread.title}
+                    className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
+                  >
+                    <Link href={thread.href} className="block transition-colors hover:text-foreground">
                       <p className="text-sm font-semibold">{thread.title}</p>
                       <p className="mt-1 text-sm leading-6 text-muted-foreground">{thread.body}</p>
                     </Link>
-                  ))}
-                </div>
+                    <SectionFeedback
+                      page="overview"
+                      targetType="thread"
+                      targetId={creatorToolsFeedbackId("overview", "thread", thread.title)}
+                      className="mt-4"
+                    />
+                  </div>
+                ))}
               </div>
+            </div>
 
               <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
                 <div className="flex items-center gap-2">
@@ -260,15 +281,22 @@ export default function CreatorToolsDropPage() {
                   </p>
                 </div>
                 <div className="mt-4 space-y-3">
-                  {actionQueue.slice(0, 2).map((item) => (
-                    <Link
+                {actionQueue.slice(0, 2).map((item) => (
+                    <div
                       key={item.title}
-                      href={item.href}
-                      className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
+                      className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                     >
-                      <p className="text-sm font-semibold">{item.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.note}</p>
-                    </Link>
+                      <Link href={item.href} className="block transition-colors hover:text-foreground">
+                        <p className="text-sm font-semibold">{item.title}</p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.note}</p>
+                      </Link>
+                      <SectionFeedback
+                        page="overview"
+                        targetType="action"
+                        targetId={creatorToolsFeedbackId("overview", "action", item.title)}
+                        className="mt-4"
+                      />
+                    </div>
                   ))}
                 </div>
                 <Button asChild variant="ghost" className="mt-4 px-0">

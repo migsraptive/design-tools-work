@@ -43,7 +43,7 @@ export default function CreatorToolsTopPostPage() {
           <div className="rounded-[24px] border border-border/60 bg-secondary/20 p-5">
             <div className="flex items-center gap-2">
               <TrendingUp className="size-4 text-primary" />
-              <p className="text-sm font-semibold">What is driving performance</p>
+              <p className="text-sm font-semibold">Performance Drivers</p>
             </div>
             <div className="mt-4 space-y-3 text-sm text-muted-foreground">
               <p>The post landed inside the creator’s strongest morning window.</p>
@@ -55,7 +55,7 @@ export default function CreatorToolsTopPostPage() {
           <div className="rounded-[24px] border border-border/60 bg-secondary/20 p-5">
             <div className="flex items-center gap-2">
               <MessageSquareQuote className="size-4 text-primary" />
-              <p className="text-sm font-semibold">Recommended next step</p>
+              <p className="text-sm font-semibold">Action Implication</p>
             </div>
             <div className="mt-4 space-y-3 text-sm text-muted-foreground">
               <p>Reply to the top unanswered reader question.</p>
