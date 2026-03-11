@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Brain, FlaskConical } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  formatPlainTextSections,
+  toPlainText,
+} from "@/lib/design-ops-formatting";
 import { cn } from "@/lib/utils";
 import type { AgentMessage } from "@/lib/design-ops-types";
 
@@ -36,6 +40,10 @@ const CONFIDENCE_STYLES: Record<string, string> = {
 };
 
 export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(
+    () => new Set()
+  );
+
   if (messages.length === 0) {
     return (
       <div className="text-center py-12">
@@ -54,102 +62,149 @@ export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
         const isLast = i === messages.length - 1;
         const recipient =
           msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to;
+        const body = toPlainText(msg.body);
+        const bodySections = formatPlainTextSections(msg.body);
+        const assumptions = toPlainText(msg.assumptions);
+        const nextStep = toPlainText(msg.nextStep);
+        const preview = body.replace(/\s+/g, " ").trim();
+        const hasDetails =
+          preview.length > 120 || Boolean(assumptions || nextStep);
+        const isExpanded = expandedIndices.has(i);
 
         return (
-          <div key={i} className="relative pl-14">
+          <div key={i} className="relative pl-10">
             {/* Timeline connector */}
             {!isLast && (
-              <div className="absolute left-5 top-11 bottom-[-0.75rem] w-px bg-border" />
+              <div className="absolute left-3 top-8 bottom-[-0.75rem] w-px bg-border/70" />
             )}
 
             <div
               className={cn(
-                "absolute left-0 top-3 flex size-10 items-center justify-center rounded-lg bg-muted",
+                "absolute left-0 top-1.5 flex size-6 items-center justify-center rounded-md bg-muted/60",
                 agent.color
               )}
             >
-              <Icon className="size-5" />
+              <Icon className="size-3.5" />
             </div>
 
-            <Card className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <CardHeader className="px-4 py-3">
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span
-                    className={cn(
-                      "text-[11px] font-semibold uppercase tracking-[0.16em]",
-                      agent.color
-                    )}
-                  >
-                    {msg.fromName || agent.label}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {agent.role}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    → {recipient}
-                  </span>
-                  {msg.confidence !== "n/a" && (
-                    <Badge
-                      variant="outline"
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-border/60 bg-card/60 px-3 py-2 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] leading-4">
+                    <span
                       className={cn(
-                        "h-5 rounded-md px-1.5 text-[10px]",
-                        CONFIDENCE_STYLES[msg.confidence]
+                        "font-semibold uppercase tracking-[0.18em]",
+                        agent.color
                       )}
                     >
-                      {msg.confidence}
-                    </Badge>
-                  )}
-                  {msg.priority === "critical" && (
-                    <Badge
-                      variant="destructive"
-                      className="h-5 rounded-md px-1.5 text-[10px]"
-                    >
-                      critical
-                    </Badge>
-                  )}
-                </div>
-
-                <CardTitle className="text-base font-black tracking-tight leading-5">
-                  {msg.subject}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="px-4 pb-3 pt-0">
-                <div className="space-y-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm leading-6 text-foreground/90 whitespace-pre-wrap">
-                      {msg.body}
-                    </div>
-
-                    {(msg.assumptions || msg.nextStep) && (
-                      <div className="flex flex-col gap-1.5 border-t border-border/60 pt-2 text-xs leading-5">
-                        {msg.assumptions && (
-                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                            <span className="font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                              Assumptions
-                            </span>
-                            <span className="text-muted-foreground">
-                              {msg.assumptions}
-                            </span>
-                          </div>
-                        )}
-
-                        {msg.nextStep && (
-                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                            <span className="font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                              Next
-                            </span>
-                            <span className="text-foreground/80">
-                              {msg.nextStep}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                      {msg.fromName || agent.label}
+                    </span>
+                    <span className="text-muted-foreground">{agent.role}</span>
+                    <span className="text-muted-foreground">→ {recipient}</span>
                   </div>
+
+                  <div className="flex items-start gap-2">
+                    <p className="min-w-0 flex-1 text-sm font-semibold tracking-tight leading-5 text-foreground">
+                      {msg.subject}
+                    </p>
+                    <div className="flex shrink-0 items-center gap-1">
+                      {msg.confidence !== "n/a" && (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "h-4 rounded-sm px-1 text-[9px] font-medium uppercase tracking-[0.12em]",
+                            CONFIDENCE_STYLES[msg.confidence]
+                          )}
+                        >
+                          {msg.confidence}
+                        </Badge>
+                      )}
+                      {msg.priority === "critical" && (
+                        <Badge
+                          variant="destructive"
+                          className="h-4 rounded-sm px-1 text-[9px] font-medium uppercase tracking-[0.12em]"
+                        >
+                          critical
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {!isExpanded && (
+                    <p className="line-clamp-1 text-xs leading-5 text-muted-foreground">
+                      {preview}
+                    </p>
+                  )}
+
+                  {isExpanded && (
+                    <div className="space-y-3 border-t border-border/50 pt-2">
+                      {bodySections.map((section) => (
+                        <div key={section.label} className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            {section.label}
+                          </p>
+                          <div className="space-y-1">
+                            {section.content.map((line, index) => (
+                              <p
+                                key={`${section.label}-${index}`}
+                                className="text-xs leading-5 text-foreground/85"
+                              >
+                                {line}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+
+                      {assumptions && (
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            Assumptions
+                          </p>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {assumptions}
+                          </p>
+                        </div>
+                      )}
+                      {nextStep && (
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            Next
+                          </p>
+                          <p className="text-xs leading-5 text-foreground/85">
+                            {nextStep}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+
+                {hasDetails && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExpandedIndices((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(i)) {
+                          next.delete(i);
+                        } else {
+                          next.add(i);
+                        }
+                        return next;
+                      });
+                    }}
+                    className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {isExpanded ? "Less" : "More"}
+                  </button>
+                )}
+              </div>
+
+              {!hasDetails && preview.length === 0 && (
+                <div className="text-xs text-muted-foreground">No details provided.</div>
+              )}
+            </div>
           </div>
         );
       })}

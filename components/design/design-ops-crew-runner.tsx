@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Loader2, Play, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { toPlainText } from "@/lib/design-ops-formatting";
 import { toast } from "sonner";
 import type {
   Objective,
@@ -140,12 +141,12 @@ export function DesignOpsCrewRunner({
               from: data.from,
               fromName: data.from_name || data.fromName || "",
               to: data.to || "",
-              subject: data.subject || "",
+              subject: toPlainText(data.subject || ""),
               priority: data.priority || "standard",
               confidence: data.confidence || "medium",
-              assumptions: data.assumptions || "",
-              body: data.body || "",
-              nextStep: data.next_step || data.nextStep || "",
+              assumptions: toPlainText(data.assumptions || ""),
+              body: toPlainText(data.body || ""),
+              nextStep: toPlainText(data.next_step || data.nextStep || ""),
               timestamp: data.timestamp || new Date().toISOString(),
             };
             context.messages.push(msg);
