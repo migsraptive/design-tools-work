@@ -1,6 +1,10 @@
 import { CalendarClock, Clock3, WandSparkles } from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
 import { Badge } from "@/components/ui/badge";
+import {
+  getCreatorToolsPillClass,
+  getCreatorToolsToneClass,
+} from "@/lib/creator-tools-pill";
 
 export default function CreatorToolsSchedulerPage() {
   return (
@@ -22,18 +26,21 @@ export default function CreatorToolsSchedulerPage() {
               <h2 className="mt-2 text-2xl font-black tracking-tight">
                 My 5-ingredient breakfast reset
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 This mock flow shows how a creator or team member schedules a post during
                 the audience’s strongest engagement window.
               </p>
             </div>
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
+            <Badge
+              variant="outline"
+              className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass("Scheduled")}`}
+            >
               Queued for tomorrow
             </Badge>
           </div>
         </div>
 
-        <div className="grid gap-4 p-6 lg:grid-cols-[1fr_0.9fr] md:p-8">
+        <div className="grid gap-4 p-6 xl:grid-cols-2 md:p-8">
           <div className="rounded-[24px] border border-border/60 bg-secondary/20 p-5">
             <p className="text-sm font-semibold">Composer snapshot</p>
             <div className="mt-4 rounded-2xl border border-border/60 bg-background p-4 text-sm text-muted-foreground">
@@ -49,13 +56,17 @@ export default function CreatorToolsSchedulerPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="rounded-[24px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
+            <div
+              className={`rounded-[24px] border p-5 ${getCreatorToolsToneClass(
+                "Scheduled"
+              )}`}
+            >
               <div className="flex items-center gap-2">
                 <WandSparkles className="size-4" />
                 <p className="text-sm font-semibold">AI-recommended window</p>
               </div>
               <p className="mt-3 text-lg font-bold">Tomorrow, 8:30 AM</p>
-              <p className="mt-2 text-sm leading-6 text-primary-foreground/75">
+              <p className="mt-2 text-sm leading-6 opacity-80">
                 Based on your strongest weekday morning click-through and current comment
                 momentum.
               </p>

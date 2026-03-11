@@ -22,7 +22,7 @@ export default function CreatorToolsTopPostPage() {
               <h2 className="mt-2 text-2xl font-black tracking-tight">
                 Breakout Thread Performance
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 This thread is carrying the strongest share of current community momentum
                 and still contains unresolved response opportunities.
               </p>
@@ -39,7 +39,7 @@ export default function CreatorToolsTopPostPage() {
           <DetailStat label="Engagement rate" value="6.8%" note="Best-performing format: checklist + photo" />
         </div>
 
-        <div className="grid gap-4 border-t border-border/60 p-6 lg:grid-cols-[1.1fr_0.9fr] md:p-8">
+        <div className="grid gap-4 border-t border-border/60 p-6 xl:grid-cols-2 md:p-8">
           <div className="rounded-[24px] border border-border/60 bg-secondary/20 p-5">
             <div className="flex items-center gap-2">
               <TrendingUp className="size-4 text-primary" />

@@ -38,7 +38,7 @@ const sourceConfig = {
 
 export function CreatorToolsOverviewAnalytics() {
   return (
-    <div className="grid gap-4 border-t border-border/60 p-6 xl:grid-cols-[1.18fr_0.82fr] md:p-8">
+    <div className="grid gap-4 border-t border-border/60 p-6 2xl:grid-cols-2 md:p-8">
       <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

@@ -1,9 +1,8 @@
-import Link from "next/link";
-import { ArrowLeft, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 import { BriefFramingSequence } from "@/components/design/brief-framing-sequence";
+import { CreatorToolsDocCard } from "@/components/design/creator-tools-doc-card";
+import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const userStories = [
   {
@@ -253,12 +252,11 @@ const researchSections = [
 
 function SectionCard({ title, body }: { title: string; body: string }) {
   return (
-    <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-      <h2 className="text-lg font-bold tracking-tight">{title}</h2>
+    <CreatorToolsDocCard title={title}>
       <p className="mt-2 text-sm leading-7 text-muted-foreground">
         {body}
       </p>
-    </section>
+    </CreatorToolsDocCard>
   );
 }
 
@@ -305,45 +303,27 @@ function DataTable({
 
 export default function CreatorToolsPrdPage() {
   return (
-    <div className="w-full min-w-0 space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
-              <FileText className="size-3.5" />
-              PRD Reference
-            </Badge>
-            <Badge variant="outline" className="rounded-full px-3 py-1">
-              March 2026
-            </Badge>
-          </div>
-          <div>
-            <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-              Creator Tools PRD
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Internal product reference. This document is intentionally outside the
-              primary creator-tools navigation.
+    <CreatorToolsShell
+      badge="PRD / Brief"
+      title="Creator Tools PRD"
+      description="Product reference for Creator Tools. This document now lives inside the same global Creator Tools navigation as the rest of the prototype."
+      actions={
+        <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
+          <FileText className="size-3.5" />
+          March 2026
+        </Badge>
+      }
+    >
+      <div className="space-y-8">
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              PRD / Brief
             </p>
+            <h2 className="text-2xl font-black tracking-tight md:text-3xl">
+              Product Requirements Document
+            </h2>
           </div>
-        </div>
-
-        <Button asChild variant="outline" className="rounded-full">
-          <Link href="/drops/creator-tools">
-            <ArrowLeft className="size-4" />
-            Back to prototype
-          </Link>
-        </Button>
-      </div>
-
-      <Tabs defaultValue="brief" className="gap-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="brief">PRD / Brief</TabsTrigger>
-          <TabsTrigger value="design-plan">Design Plan</TabsTrigger>
-          <TabsTrigger value="research">Research</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="brief" className="space-y-4">
           <BriefFramingSequence />
 
           <SectionCard
@@ -356,20 +336,16 @@ export default function CreatorToolsPrdPage() {
             body="Creators are the engine of the community. When they're inactive, reader engagement drops, return visits decline, and pageview revenue suffers. The current platform gives creators no visibility into what's working and no way to manage their presence efficiently."
           />
 
-          <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-            <div className="space-y-3">
+          <CreatorToolsDocCard>
+            <div className="space-y-3 text-sm leading-7 text-foreground/90">
               {userStories.map((story) => (
-                <p key={story.title} className="text-sm leading-7 text-foreground/90">
-                  {story.title}
-                </p>
+                <p key={story.title}>{story.title}</p>
               ))}
             </div>
-          </section>
+          </CreatorToolsDocCard>
 
-          <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-            <h2 className="text-lg font-bold tracking-tight">External Forces</h2>
-
-            <div className="mt-4 space-y-4">
+          <CreatorToolsDocCard title="External Forces">
+            <div className="space-y-4">
               <div>
                 <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   What we know from existing data
@@ -406,7 +382,7 @@ export default function CreatorToolsPrdPage() {
                 </p>
               </div>
             </div>
-          </section>
+          </CreatorToolsDocCard>
 
           <section className="space-y-4">
             <SectionCard
@@ -480,9 +456,8 @@ export default function CreatorToolsPrdPage() {
             />
           </section>
 
-          <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-            <h2 className="text-lg font-bold tracking-tight">What Is Not Covered Here</h2>
-            <div className="mt-4 space-y-4">
+          <CreatorToolsDocCard title="What Is Not Covered Here">
+            <div className="space-y-4">
               {exclusions.map((item) => (
                 <div key={item.title}>
                   <h3 className="text-sm font-semibold">{item.title}</h3>
@@ -490,48 +465,62 @@ export default function CreatorToolsPrdPage() {
                 </div>
               ))}
             </div>
-          </section>
+          </CreatorToolsDocCard>
 
           <SectionCard
             title="Timeline & Deadline"
             body="No hard external deadline. Sprint breakdown to be done in partnership with engineering after creator research is complete."
           />
 
-          <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-            <h2 className="text-lg font-bold tracking-tight">Rollout Plan</h2>
+          <CreatorToolsDocCard title="Rollout Plan">
             <ul className="mt-4 space-y-2 text-sm leading-7 text-foreground/90">
               {rolloutPlan.map((item) => (
                 <li key={item}>- {item}</li>
               ))}
             </ul>
-          </section>
+          </CreatorToolsDocCard>
 
-          <section className="rounded-[24px] border border-border/60 bg-card/85 p-6">
-            <h2 className="text-lg font-bold tracking-tight">Supporting Docs & Links</h2>
+          <CreatorToolsDocCard title="Supporting Docs & Links">
             <ul className="mt-4 space-y-2 text-sm leading-7 text-foreground/90">
               {supportingDocs.map((item) => (
                 <li key={item}>- [ ] {item}</li>
               ))}
             </ul>
-          </section>
-        </TabsContent>
+          </CreatorToolsDocCard>
+        </section>
 
-        <TabsContent value="design-plan" className="space-y-4">
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Design Plan
+            </p>
+            <h2 className="text-2xl font-black tracking-tight md:text-3xl">
+              Design Approach
+            </h2>
+          </div>
           <div className="grid gap-4">
             {designPlanSections.map((section) => (
               <SectionCard key={section.title} {...section} />
             ))}
           </div>
-        </TabsContent>
+        </section>
 
-        <TabsContent value="research" className="space-y-4">
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Research
+            </p>
+            <h2 className="text-2xl font-black tracking-tight md:text-3xl">
+              Research Foundation
+            </h2>
+          </div>
           <div className="grid gap-4">
             {researchSections.map((section) => (
               <SectionCard key={section.title} {...section} />
             ))}
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </section>
+      </div>
+    </CreatorToolsShell>
   );
 }

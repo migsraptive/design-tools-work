@@ -1,9 +1,12 @@
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { BellRing, CalendarClock, Pin, ShieldCheck } from "lucide-react";
+import { CreatorToolsLinkCard } from "@/components/design/creator-tools-link-card";
+import { CreatorToolsLeadCard } from "@/components/design/creator-tools-lead-card";
+import { CreatorToolsSectionPanel } from "@/components/design/creator-tools-section-panel";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { CreatorToolsPageSurface } from "@/components/design/creator-tools-page-surface";
 import { SectionFeedback } from "@/components/design/section-feedback";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   actionQueue,
@@ -19,9 +22,9 @@ export default function CreatorToolsActionsPage() {
     <CreatorToolsShell
       badge="Actions"
       title="Priority Actions"
-      description="The clearest next moves, grounded in current themes, audience shifts, and conversation activity."
+      description="The decision layer that turns performance signal, audience behavior, and conversation context into the next useful creator move."
     >
-      <section className="overflow-hidden rounded-[32px] border border-border/70 bg-card shadow-sm">
+      <CreatorToolsPageSurface>
         <div className="border-b border-border/60 px-6 py-5 md:px-8">
           <div className="flex items-start gap-2 text-sm font-semibold text-muted-foreground">
             <BellRing className="size-4 text-primary" />
@@ -30,51 +33,30 @@ export default function CreatorToolsActionsPage() {
           <h2 className="mt-2 text-2xl font-black tracking-tight md:text-3xl">
             Recommended Moves
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Each recommendation below is tied to a current signal in themes, audience
-            movement, or thread-level activity.
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            This surface answers the product question behind the PRD: what should the
+            creator do next? Every recommendation is tied to a capability area in V1,
+            whether that means posting control, performance understanding, or an
+            engagement prompt.
           </p>
         </div>
 
-        <div className="grid gap-4 p-6 xl:grid-cols-[1.15fr_0.85fr] md:p-8">
-          <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Prioritized actions
-            </p>
-            <div className="mt-4 space-y-3">
-              {actionQueue.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
-                >
-                  <Link href={item.href} className="block transition-colors hover:text-foreground">
-                    <p className="text-sm font-semibold">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.note}</p>
-                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                      {item.source}
-                    </p>
-                  </Link>
-                  <SectionFeedback
-                    page="actions"
-                    targetType="action"
-                    targetId={creatorToolsFeedbackId("actions", "action", item.title)}
-                    className="mt-4"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
+        <div className="grid gap-4 p-6 2xl:grid-cols-2 md:p-8">
           <div className="space-y-4">
-            <div className="rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-                Decision Path
-              </p>
-              <p className="mt-3 text-sm leading-6 text-primary-foreground/80">
-                Meal prep systems are moving from strong theme momentum into unanswered
-                thread activity and a timely follow-up publishing window.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
+            <CreatorToolsLeadCard
+              eyebrow="Recommended move now"
+              title="Reply in the meal prep thread, then schedule the follow-up template post."
+              description="This is the clearest path from signal to outcome right now: answer the active questions while the conversation is still compounding, then lock in the next post while attention is high."
+              details={
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Why this move leads</p>
+                  <p className="text-sm leading-6 text-primary-foreground/80">
+                    The strongest theme, the highest-value thread, and the best posting window all point to the same next step. That alignment is what makes this recommendation stronger than a generic task list.
+                  </p>
+                </div>
+              }
+              actions={
+                <>
                 <Button asChild size="sm" variant="secondary">
                   <Link href="/drops/creator-tools/nudges/high-signal-question">
                     Open response opportunity
@@ -88,30 +70,24 @@ export default function CreatorToolsActionsPage() {
                 >
                   <Link href="/drops/creator-tools/controls/scheduler">Open publishing controls</Link>
                 </Button>
-              </div>
-            </div>
+                </>
+              }
+            />
 
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Response Opportunities
-              </p>
-              <div className="mt-4 space-y-3">
+            <CreatorToolsSectionPanel title="Signals behind this recommendation">
+              <div className="space-y-3">
               {nudgeInbox.map((item) => (
                   <div
                     key={item.title}
                     className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                   >
-                    <Link href={item.href} className="block transition-colors hover:text-foreground">
-                      <div className="flex items-center justify-between gap-3">
-                        <Badge variant="outline" className="rounded-full px-3 py-1">
-                          {item.type}
-                        </Badge>
-                        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                          {item.priority}
-                        </span>
-                      </div>
-                      <p className="mt-3 text-sm font-semibold">{item.title}</p>
-                    </Link>
+                    <CreatorToolsLinkCard
+                      href={item.href}
+                      title={item.title}
+                      description={item.body}
+                      badge={item.type}
+                      meta={item.priority}
+                    />
                     <SectionFeedback
                       page="actions"
                       targetType="action"
@@ -121,14 +97,44 @@ export default function CreatorToolsActionsPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
           </div>
+
+          <CreatorToolsSectionPanel title="Priority action queue">
+            <div className="space-y-3">
+              {actionQueue.map((item) => (
+                <div
+                  key={item.title}
+                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
+                >
+                  <Link href={item.href} className="block transition-colors hover:text-foreground">
+                    <p className="text-base font-bold leading-7 tracking-tight">{item.title}</p>
+                    <div className="mt-3 rounded-2xl border border-border/60 bg-background/90 px-4 py-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        Why this is worth doing
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-foreground/90">{item.note}</p>
+                    </div>
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                      {item.source}
+                    </p>
+                  </Link>
+                  <SectionFeedback
+                    page="actions"
+                    targetType="action"
+                    targetId={creatorToolsFeedbackId("actions", "action", item.title)}
+                    className="mt-4"
+                  />
+                </div>
+              ))}
+            </div>
+          </CreatorToolsSectionPanel>
         </div>
 
         <div className="grid gap-4 border-t border-border/60 p-6 xl:grid-cols-3 md:p-8">
           <ActionPanel
             icon={CalendarClock}
-            title="Scheduling"
+            title="Post consistency"
             items={scheduledPosts.map((post) => ({
               title: post.title,
               detail: `${post.publishAt} • ${post.source}`,
@@ -137,7 +143,7 @@ export default function CreatorToolsActionsPage() {
           />
           <ActionPanel
             icon={Pin}
-            title="Pinning & placement"
+            title="Discoverability control"
             items={pinnedPosts.map((post) => ({
               title: post.title,
               detail: post.note,
@@ -146,7 +152,7 @@ export default function CreatorToolsActionsPage() {
           />
           <ActionPanel
             icon={ShieldCheck}
-            title="Moderation & review"
+            title="Trust & delegation"
             items={moderationActions.map((action) => ({
               title: action.title,
               detail: action.note,
@@ -154,7 +160,7 @@ export default function CreatorToolsActionsPage() {
             }))}
           />
         </div>
-      </section>
+      </CreatorToolsPageSurface>
     </CreatorToolsShell>
   );
 }
@@ -169,25 +175,18 @@ function ActionPanel({
   items: { title: string; detail: string; href: string }[];
 }) {
   return (
-    <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-      <div className="flex items-center gap-2">
-        <Icon className="size-4 text-primary" />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {title}
-        </p>
-      </div>
-      <div className="mt-4 space-y-3">
+    <CreatorToolsSectionPanel title={title} icon={Icon}>
+      <div className="space-y-3">
         {items.map((item) => (
-          <Link
+          <CreatorToolsLinkCard
             key={item.title}
             href={item.href}
-            className="block rounded-2xl border border-border/60 bg-secondary/25 p-4 transition-colors hover:bg-secondary/40"
-          >
-            <p className="text-sm font-semibold">{item.title}</p>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-          </Link>
+            title={item.title}
+            description={item.detail}
+            className="hover:bg-secondary/40"
+          />
         ))}
       </div>
-    </div>
+    </CreatorToolsSectionPanel>
   );
 }

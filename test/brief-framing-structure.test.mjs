@@ -9,11 +9,11 @@ function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
 }
 
-test("creator tools PRD page uses tabs and includes the PRD framing rule", () => {
+test("creator tools PRD page uses the global creator tools shell and includes the PRD framing rule", () => {
   const page = read("app/drops/creator-tools/prd/page.tsx");
   const component = read("components/design/brief-framing-sequence.tsx");
 
-  assert.match(page, /Tabs,\s*TabsContent,\s*TabsList,\s*TabsTrigger/);
+  assert.match(page, /CreatorToolsShell/);
   assert.match(page, /PRD \/ Brief/);
   assert.match(page, /Design Plan/);
   assert.match(page, /Research/);
@@ -24,6 +24,7 @@ test("creator tools PRD page uses tabs and includes the PRD framing rule", () =>
   assert.match(page, /Functional Requirements & Scope/);
   assert.match(page, /problem -> proposed capability -> expected outcome/i);
   assert.match(page, /DataTable/);
+  assert.doesNotMatch(page, /TabsList/);
   assert.doesNotMatch(page, /max-w-3xl text-sm leading-7 text-muted-foreground/);
   assert.match(component, /Goal -&gt; problem\/opportunity -&gt; proposed solution -&gt; expected outcome/i);
 });

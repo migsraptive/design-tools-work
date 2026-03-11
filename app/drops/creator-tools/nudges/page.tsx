@@ -1,51 +1,26 @@
 import Link from "next/link";
-import { ArrowLeft, BellRing, Mail, MessageSquareQuote, Settings2, Sparkles } from "lucide-react";
-import { CreatorToolsPrototypeNav } from "@/components/design/creator-tools-prototype-nav";
+import { BellRing, Mail, MessageSquareQuote, Settings2 } from "lucide-react";
+import { CreatorToolsLinkCard } from "@/components/design/creator-tools-link-card";
+import { CreatorToolsLeadCard } from "@/components/design/creator-tools-lead-card";
+import { CreatorToolsSectionPanel } from "@/components/design/creator-tools-section-panel";
+import { CreatorToolsSimpleStatCard } from "@/components/design/creator-tools-simple-stat-card";
+import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { CreatorToolsPageSurface } from "@/components/design/creator-tools-page-surface";
 import { FadeIn } from "@/components/motion/fade-in";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCreatorToolsPillClass } from "@/lib/creator-tools-pill";
 import { experimentStats, nudgeInbox, nudgeKpis, nudgePreferences } from "@/lib/mock/creator-tools";
 
 export default function CreatorToolsNudgesPage() {
   return (
-    <div className="w-full min-w-0 space-y-6">
-      <FadeIn className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
-                <Sparkles className="size-3.5" />
-                Project Drop
-              </Badge>
-              <Badge variant="outline" className="rounded-full px-3 py-1">
-                Legacy Subsurface
-              </Badge>
-            </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-                Response Prompts
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Supporting execution surface for response prompts and timing cues. In the
-                new IA, these recommendations sit inside Actions rather than as a primary
-                navigation category.
-              </p>
-            </div>
-          </div>
-
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/drops/creator-tools/actions">
-              <ArrowLeft className="size-4" />
-              Back to Actions
-            </Link>
-          </Button>
-        </div>
-
-        <CreatorToolsPrototypeNav />
-      </FadeIn>
-
+    <CreatorToolsShell
+      badge="Nudges"
+      title="AI-Driven Engagement Nudges"
+      description="The PRD feature area for well-timed creator prompts. These nudges help creators notice conversations worth joining, recover lapsed readers, and break through blank-page friction without becoming notification spam."
+    >
       <FadeIn delay={0.05} className="w-full">
-        <section className="overflow-hidden rounded-[32px] border border-border/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(244,244,245,0.98))] shadow-sm dark:bg-[linear-gradient(180deg,_rgba(24,24,27,0.96),_rgba(39,39,42,0.98))]">
+        <CreatorToolsPageSurface tone="gradient">
           <div className="border-b border-border/60 px-6 py-5 md:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div className="space-y-2">
@@ -56,17 +31,24 @@ export default function CreatorToolsNudgesPage() {
                 <h2 className="text-2xl font-black tracking-tight md:text-3xl">
                   Timely Response Signals
                 </h2>
-                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  These prompts translate active conversation signals into timely response
-                  opportunities and publishing follow-through.
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Nudges should feel like a trusted assistant, not a nagging system.
+                  They are opt-in, configurable, and only valuable when the signal is
+                  specific enough to drive an immediate creator decision.
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="secondary" className="rounded-full px-3 py-1">
+                <Badge
+                  variant="secondary"
+                  className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass("Daily digest default")}`}
+                >
                   Daily digest default
                 </Badge>
-                <Badge variant="outline" className="rounded-full px-3 py-1">
+                <Badge
+                  variant="outline"
+                  className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass("High-signal question")}`}
+                >
                   Mock data
                 </Badge>
               </div>
@@ -75,82 +57,65 @@ export default function CreatorToolsNudgesPage() {
 
           <div className="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-4 md:p-8">
             {nudgeKpis.map((item) => (
-              <div key={item.label} className="rounded-[24px] border border-border/60 bg-background/90 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-3 text-3xl font-black tracking-tight">{item.value}</p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-              </div>
+              <CreatorToolsSimpleStatCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                detail={item.detail}
+              />
             ))}
           </div>
 
-          <div className="grid gap-4 border-t border-border/60 bg-secondary/20 p-6 xl:grid-cols-[1.05fr_0.95fr] md:p-8">
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <div className="flex items-center gap-2">
-                <MessageSquareQuote className="size-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Response queue
-                </p>
-              </div>
-              <div className="mt-5 space-y-3">
+          <div className="grid gap-4 border-t border-border/60 bg-secondary/20 p-6 2xl:grid-cols-2 md:p-8">
+            <CreatorToolsSectionPanel title="Nudge types" icon={MessageSquareQuote}>
+              <div className="space-y-3">
                 {nudgeInbox.map((item) => (
-                  <Link
+                  <CreatorToolsLinkCard
                     key={item.title}
                     href={item.href}
-                    className="group block rounded-2xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/35 hover:border-primary/30"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <Badge variant="outline" className="rounded-full px-3 py-1">
-                        {item.type}
-                      </Badge>
-                      <span className="text-sm font-medium text-primary underline-offset-4 group-hover:underline">
-                        {item.priority}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-sm font-semibold">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
-                    <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                      View signal
-                    </p>
-                  </Link>
+                    title={item.title}
+                    description={item.body}
+                    badge={item.type}
+                    meta={item.priority}
+                    footerLabel="View signal"
+                  />
                 ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
 
             <div className="space-y-4">
-              <div className="rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-                Digest summary
-              </p>
-                <div className="mt-4 rounded-2xl border border-primary-foreground/15 bg-black/10 p-4">
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    <Mail className="size-4" />
-                    Today’s creator opportunities
+              <CreatorToolsLeadCard
+                eyebrow="Best nudge right now"
+                title="Use the high-signal question digest as the first interruption worth sending."
+                description="The goal is not to notify more. It is to interrupt only when the creator can immediately see why a response matters and what they should do next."
+                details={
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-semibold">
+                      <Mail className="size-4" />
+                      Creator opportunity digest
+                    </div>
+                    <p className="text-sm leading-6 text-primary-foreground/80">
+                      1 high-signal question, 1 lapsed reader opportunity, and 1
+                      conversation starter are ready for review. The product defaults
+                      to daily digest and only escalates to real-time when the signal
+                      is clearly worth interrupting for.
+                    </p>
                   </div>
-                  <p className="mt-3 text-sm leading-6 text-primary-foreground/80">
-                    1 high-signal question, 1 lapsed reader opportunity, and 1 conversation
-                    starter are ready for review.
-                  </p>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button asChild size="sm" variant="secondary">
-                    <Link href="/drops/creator-tools/nudges/high-signal-question">Open leading signal</Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                    <Link href="/drops/creator-tools/controls/scheduler">Convert to scheduled post</Link>
-                  </Button>
-                </div>
-              </div>
+                }
+                actions={
+                  <>
+                <Button asChild size="sm" variant="secondary">
+                  <Link href="/drops/creator-tools/nudges/high-signal-question">Open leading signal</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
+                  <Link href="/drops/creator-tools/controls/scheduler">Convert to scheduled post</Link>
+                </Button>
+                  </>
+                }
+              />
 
-              <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-                <div className="flex items-center gap-2">
-                  <Settings2 className="size-4 text-primary" />
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Delivery preferences
-                  </p>
-                </div>
-                <div className="mt-5 space-y-3">
+              <CreatorToolsSectionPanel title="Creator controls" icon={Settings2}>
+                <div className="space-y-3">
                   {nudgePreferences.map((item) => (
                     <div key={item.label} className="flex items-center justify-between gap-4 rounded-2xl border border-border/60 bg-secondary/20 px-4 py-3">
                       <span className="text-sm font-medium">{item.label}</span>
@@ -158,23 +123,22 @@ export default function CreatorToolsNudgesPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </CreatorToolsSectionPanel>
             </div>
           </div>
 
           <div className="grid gap-4 border-t border-border/60 p-6 md:grid-cols-3 md:p-8">
             {experimentStats.map((item) => (
-              <div key={item.label} className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-3 text-3xl font-black tracking-tight">{item.value}</p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.note}</p>
-              </div>
+              <CreatorToolsSimpleStatCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                detail={item.note}
+              />
             ))}
           </div>
-        </section>
+        </CreatorToolsPageSurface>
       </FadeIn>
-    </div>
+    </CreatorToolsShell>
   );
 }

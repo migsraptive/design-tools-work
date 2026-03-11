@@ -1,61 +1,171 @@
 import type { DataConfidenceMeta } from "@/lib/data-confidence";
 
 export const creatorToolsNav = [
+  { href: "/drops/creator-tools/prd", label: "PRD / Brief" },
   { href: "/drops/creator-tools", label: "Overview" },
-  { href: "/drops/creator-tools/themes", label: "Themes" },
+  { href: "/drops/creator-tools/themes", label: "What's Working" },
   { href: "/drops/creator-tools/audience", label: "Audience" },
-  { href: "/drops/creator-tools/threads", label: "Threads" },
-  { href: "/drops/creator-tools/actions", label: "Actions" },
-];
+  { href: "/drops/creator-tools/threads", label: "Show Up Now" },
+  { href: "/drops/creator-tools/actions", label: "Next Steps" },
+  { href: "/drops/creator-tools/controls", label: "Controls" },
+  { href: "/drops/creator-tools/nudges", label: "Nudges" },
+] as const;
+
+export const creatorToolsSubNav = [
+  {
+    rootHref: "/drops/creator-tools/controls",
+    items: [
+      { href: "/drops/creator-tools/controls", label: "Overview" },
+      { href: "/drops/creator-tools/controls/scheduler", label: "Scheduling" },
+      { href: "/drops/creator-tools/controls/pins", label: "Pins" },
+      { href: "/drops/creator-tools/controls/team-review", label: "Team Review" },
+      { href: "/drops/creator-tools/controls/moderation", label: "Moderation" },
+    ],
+  },
+  {
+    rootHref: "/drops/creator-tools/nudges",
+    items: [
+      { href: "/drops/creator-tools/nudges", label: "Overview" },
+      { href: "/drops/creator-tools/nudges/high-signal-question", label: "High-Signal Question" },
+      { href: "/drops/creator-tools/nudges/lapsed-reader", label: "Lapsed Reader" },
+      { href: "/drops/creator-tools/nudges/conversation-starter", label: "Conversation Starter" },
+    ],
+  },
+] as const;
 
 export const creatorToolsModules = [
   {
-    title: "Themes",
+    title: "What's Working",
     href: "/drops/creator-tools/themes",
-    summary:
-      "See the topics creating the most momentum so the team understands what is broadly resonating before chasing individual moments.",
-    cue: "Start here when the question is what is moving overall.",
-    status: "Signal layer",
+    insight:
+      "See which topics, formats, and reader patterns are actually driving engagement.",
+    spotlightLabel: "Leading signal",
+    spotlightValue: "Meal prep systems are carrying the strongest repeat engagement.",
+    supporting:
+      "Use this first before deciding what to repeat, expand, or turn into the next creator move.",
+    ctaLabel: "Open performance signals",
+    status: "Performance",
   },
   {
-    title: "Audience",
-    href: "/drops/creator-tools/audience",
-    summary:
-      "Translate those themes into concrete reader segments and returning behavior so the team knows who is worth designing for next.",
-    cue: "Use this when you need to connect topics to people.",
-    status: "Segment layer",
-  },
-  {
-    title: "Threads",
+    title: "Show Up Now",
     href: "/drops/creator-tools/threads",
-    summary:
-      "Move from broad signal into the actual conversations driving engagement, unresolved questions, and creator participation opportunities.",
-    cue: "Go here when you need to inspect the live conversation surface.",
-    status: "Conversation layer",
+    insight:
+      "Move straight into the conversations that are most worth a creator response right now.",
+    spotlightLabel: "Highest-value response",
+    spotlightValue: "Readers are asking for concrete templates they can use this week.",
+    supporting:
+      "Go here when the real question is where creator attention matters most, not just what is trending.",
+    ctaLabel: "Open participation signals",
+    status: "Participation",
   },
   {
-    title: "Actions",
+    title: "Next Steps",
     href: "/drops/creator-tools/actions",
-    summary:
-      "Turn signal into next steps by prioritizing creator follow-through, publishing moves, and response opportunities.",
-    cue: "This is where decision-making and execution come together.",
-    status: "Decision layer",
+    insight:
+      "Turn signal into an immediate move: reply, schedule, pin, or delegate.",
+    spotlightLabel: "Recommended move now",
+    spotlightValue: "Schedule the meal-prep template post, then reply in the breakout thread.",
+    supporting:
+      "This is the clearest path from insight to action when the team needs a confident recommendation now.",
+    ctaLabel: "Open action recommendations",
+    status: "Action",
   },
 ] as const;
 
 export const creatorToolsSupportingSurfaces = [
   {
+    title: "Audience Context",
+    href: "/drops/creator-tools/audience",
+    summary:
+      "Open this when you need more context on who is returning, drifting, or deepening engagement behind the top signals.",
+  },
+  {
     title: "Publishing Controls",
     href: "/drops/creator-tools/controls",
     summary:
-      "Scheduling, pinning, moderation, and delegated publishing support execution after an action has already been prioritized.",
+      "Scheduling, pinning, moderation, and delegated publishing support execution after a next step has been chosen.",
   },
   {
-    title: "Response Prompts",
+    title: "Prompt Patterns",
     href: "/drops/creator-tools/nudges",
     summary:
-      "Prompt patterns and timing cues support follow-through, but they should reinforce Actions rather than compete with it in the IA.",
+      "High-signal questions, re-engagement cues, and conversation starters support follow-through without crowding the primary flow.",
   },
+] as const;
+
+export const creatorToolsPrdHighlights = [
+  {
+    title: "Posting consistency",
+    body:
+      "Creators need to stay present without being online in real time. V1 starts by reducing the operational friction that causes silence.",
+  },
+  {
+    title: "Performance visibility",
+    body:
+      "Creators need to know what content is actually driving engagement and pageviews so they can repeat what works.",
+  },
+  {
+    title: "Timely participation",
+    body:
+      "Creators need help identifying which conversations deserve attention now instead of monitoring the community manually.",
+  },
+] as const;
+
+export const creatorToolsV1Pillars = [
+  {
+    title: "Post & Community Controls",
+    summary:
+      "Scheduling, pinning, moderation, and delegation create consistency without forcing creators to be online at every moment.",
+    outcomes: [
+      "More consistent posting cadence",
+      "Higher trust in creator-side controls",
+    ],
+    href: "/drops/creator-tools/controls",
+  },
+  {
+    title: "Performance Understanding",
+    summary:
+      "Analytics should answer what is working and what to do next, not dump raw numbers on the creator.",
+    outcomes: [
+      "Better content decisions",
+      "Stronger link between engagement and pageviews",
+    ],
+    href: "/drops/creator-tools/themes",
+  },
+  {
+    title: "Engagement Prompts",
+    summary:
+      "High-signal questions, lapsed reader cues, and conversation starters help creators show up at the right moment.",
+    outcomes: [
+      "More timely participation",
+      "Reduced reader churn",
+    ],
+    href: "/drops/creator-tools/nudges",
+  },
+] as const;
+
+export const creatorToolsSuccessMetrics = [
+  {
+    label: "Posting frequency",
+    target: "+25%",
+    detail: "posts per creator per month",
+  },
+  {
+    label: "Creator habit formation",
+    target: "+15%",
+    detail: "DAU / WAU vs. baseline",
+  },
+  {
+    label: "Session pageviews",
+    target: "+10%",
+    detail: "pageviews per community session",
+  },
+] as const;
+
+export const creatorToolsRolloutNotes = [
+  "Beta with a small cohort of high-activity creators before broad release.",
+  "Expand by creator activity tier after validating adoption and prompt quality.",
+  "Treat Sprint 0 research as the gate before engineering commit on deferred areas like integrations.",
 ] as const;
 
 export const creatorToolsConfidenceSummary = {
