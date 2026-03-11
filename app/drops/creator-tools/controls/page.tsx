@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CalendarClock, Pin, ShieldCheck, Sparkles, Users } from "lucide-react";
-import { CreatorToolsPrototypeNav } from "@/components/design/creator-tools-prototype-nav";
+import { CalendarClock, Pin, ShieldCheck, Users } from "lucide-react";
+import { CreatorToolsLinkCard } from "@/components/design/creator-tools-link-card";
+import { CreatorToolsLeadCard } from "@/components/design/creator-tools-lead-card";
+import { CreatorToolsSectionPanel } from "@/components/design/creator-tools-section-panel";
+import { CreatorToolsSimpleStatCard } from "@/components/design/creator-tools-simple-stat-card";
+import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { CreatorToolsPageSurface } from "@/components/design/creator-tools-page-surface";
 import { FadeIn } from "@/components/motion/fade-in";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCreatorToolsPillClass } from "@/lib/creator-tools-pill";
 import {
   controlsKpis,
   moderationActions,
@@ -14,52 +20,13 @@ import {
 
 export default function CreatorToolsControlsPage() {
   return (
-    <div className="w-full min-w-0 space-y-6">
-      <FadeIn className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary" className="gap-1 rounded-full px-3 py-1">
-                <Sparkles className="size-3.5" />
-                Project Drop
-              </Badge>
-              <Badge variant="outline" className="rounded-full px-3 py-1">
-                Legacy Subsurface
-              </Badge>
-            </div>
-            <div>
-              <h1 className="text-3xl font-black tracking-tight md:text-4xl">
-                Publishing Controls
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Execution tools for scheduling, pinning, moderation, and delegated
-                publishing. In the new IA, this surface supports actions rather than
-                leading the workflow.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button asChild variant="outline" className="rounded-full">
-              <Link href="/drops/creator-tools/actions">
-                <ArrowLeft className="size-4" />
-                Back to Actions
-              </Link>
-            </Button>
-            <Button asChild variant="outline" className="rounded-full">
-              <Link href="/drops/creator-tools/actions">
-                Open Actions
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        <CreatorToolsPrototypeNav />
-      </FadeIn>
-
+    <CreatorToolsShell
+      badge="Controls"
+      title="Post & Community Controls"
+      description="Scheduling, pinning, moderation, and delegated publishing for creators and their teams. This is the PRD feature area focused on reducing friction and giving creators more control over presence."
+    >
       <FadeIn delay={0.05} className="w-full">
-        <section className="overflow-hidden rounded-[32px] border border-border/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(244,244,245,0.98))] shadow-sm dark:bg-[linear-gradient(180deg,_rgba(24,24,27,0.96),_rgba(39,39,42,0.98))]">
+        <CreatorToolsPageSurface tone="gradient">
           <div className="border-b border-border/60 px-6 py-5 md:px-8">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
               <div className="space-y-2">
@@ -70,17 +37,25 @@ export default function CreatorToolsControlsPage() {
                 <h2 className="text-2xl font-black tracking-tight md:text-3xl">
                   Operational Controls
                 </h2>
-                <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                  Use these controls after the priority has been identified. This surface
-                  handles execution, approval, and placement.
+                <p className="text-sm leading-6 text-muted-foreground">
+                  The first product priority is consistency. These controls make it
+                  easier to post ahead of time, keep important content visible, and
+                  let trusted team members support the creator without eroding reader
+                  trust.
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <Badge variant="secondary" className="rounded-full px-3 py-1">
-                  Mock workflow
+                <Badge
+                  variant="secondary"
+                  className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass("P0 focus")}`}
+                >
+                  P0 focus
                 </Badge>
-                <Badge variant="outline" className="rounded-full px-3 py-1">
+                <Badge
+                  variant="outline"
+                  className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass("Control")}`}
+                >
                   Static clickthrough
                 </Badge>
               </div>
@@ -89,111 +64,95 @@ export default function CreatorToolsControlsPage() {
 
           <div className="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-4 md:p-8">
             {controlsKpis.map((item) => (
-              <div key={item.label} className="rounded-[24px] border border-border/60 bg-background/90 p-4">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-3 text-3xl font-black tracking-tight">{item.value}</p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-              </div>
+              <CreatorToolsSimpleStatCard
+                key={item.label}
+                label={item.label}
+                value={item.value}
+                detail={item.detail}
+              />
             ))}
           </div>
 
-          <div className="grid gap-4 border-t border-border/60 bg-secondary/20 p-6 xl:grid-cols-[1.1fr_0.9fr] md:p-8">
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <div className="flex items-center gap-2">
-                <CalendarClock className="size-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Publishing queue
-                </p>
-              </div>
-              <div className="mt-5 space-y-3">
-                {scheduledPosts.map((post) => (
-                  <Link key={post.title} href={post.href} className="block rounded-2xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/35">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold">{post.title}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {post.publishAt} • {post.source}
-                        </p>
-                      </div>
-                      <Badge variant={post.status === "Scheduled" ? "secondary" : "outline"} className="rounded-full px-3 py-1">
-                        {post.status}
-                      </Badge>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground/70">
-                Delegated publishing
-              </p>
-              <p className="mt-3 text-lg font-bold leading-7">
-                Posts can go out as the creator, but the UI always shows “Posted by Team”
-                in metadata when a delegate publishes.
-              </p>
-              <div className="mt-5 rounded-2xl border border-primary-foreground/15 bg-black/10 p-4">
-                <p className="text-sm font-semibold">Preview metadata</p>
-                <p className="mt-2 text-sm text-primary-foreground/80">
-                  By Miguel Arias • Posted by Team • Scheduled for Thu at 9:00 AM
-                </p>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
+          <div className="grid gap-4 border-t border-border/60 bg-secondary/20 p-6 2xl:grid-cols-2 md:p-8">
+            <CreatorToolsLeadCard
+              eyebrow="Main control principle"
+              title="Reduce friction, but keep trust visible."
+              description="Scheduling and delegation only help if they let the creator stay present without making the community feel automated or misleading."
+              details={
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">Preview metadata</p>
+                  <p className="text-sm text-primary-foreground/80">
+                    By Miguel Arias • Posted by Team • Scheduled for Thu at 9:00 AM
+                  </p>
+                </div>
+              }
+              actions={
+                <>
                 <Button asChild size="sm" variant="secondary">
                   <Link href="/drops/creator-tools/controls/team-review">Review team draft</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline" className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white">
                   <Link href="/drops/creator-tools/controls/scheduler">Open scheduling</Link>
                 </Button>
+                </>
+              }
+            />
+
+            <CreatorToolsSectionPanel title="Publishing queue" icon={CalendarClock}>
+              <div className="space-y-3">
+                {scheduledPosts.map((post) => (
+                  <div key={post.title} className="rounded-2xl border border-border/60 bg-secondary/20 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <CreatorToolsLinkCard
+                        href={post.href}
+                        title={post.title}
+                        description={`${post.publishAt} • ${post.source}`}
+                        className="flex-1 border-0 bg-transparent p-0 hover:bg-transparent hover:border-transparent"
+                      />
+                      <Badge
+                        variant="outline"
+                        className={`rounded-full px-3 py-1 ${getCreatorToolsPillClass(
+                          post.status
+                        )}`}
+                      >
+                        {post.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
           </div>
 
-          <div className="grid gap-4 border-t border-border/60 p-6 xl:grid-cols-[0.9fr_0.9fr_1.1fr] md:p-8">
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <div className="flex items-center gap-2">
-                <Pin className="size-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Pinned placement
-                </p>
-              </div>
-              <div className="mt-5 space-y-3">
+          <div className="grid gap-4 border-t border-border/60 p-6 xl:grid-cols-2 2xl:grid-cols-3 md:p-8">
+            <CreatorToolsSectionPanel title="Pinning" icon={Pin}>
+              <div className="space-y-3">
                 {pinnedPosts.map((post) => (
-                  <Link key={post.title} href="/drops/creator-tools/controls/pins" className="block rounded-2xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/35">
-                    <p className="text-sm font-semibold">{post.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{post.note}</p>
-                  </Link>
+                  <CreatorToolsLinkCard
+                    key={post.title}
+                    href="/drops/creator-tools/controls/pins"
+                    title={post.title}
+                    description={post.note}
+                  />
                 ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
 
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="size-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Moderation queue
-                </p>
-              </div>
-              <div className="mt-5 space-y-3">
+            <CreatorToolsSectionPanel title="Post management" icon={ShieldCheck}>
+              <div className="space-y-3">
                 {moderationActions.map((action) => (
-                  <Link key={action.title} href={action.href} className="block rounded-2xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/35">
-                    <p className="text-sm font-semibold">{action.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{action.note}</p>
-                  </Link>
+                  <CreatorToolsLinkCard
+                    key={action.title}
+                    href={action.href}
+                    title={action.title}
+                    description={action.note}
+                  />
                 ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
 
-            <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
-              <div className="flex items-center gap-2">
-                <Users className="size-4 text-primary" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Publishing calendar
-                </p>
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <CreatorToolsSectionPanel title="Scheduling coverage" icon={Users}>
+              <div className="grid gap-3 sm:grid-cols-2">
                 {postingCalendar.map((item) => (
                   <div
                     key={item.day}
@@ -208,10 +167,10 @@ export default function CreatorToolsControlsPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </CreatorToolsSectionPanel>
           </div>
-        </section>
+        </CreatorToolsPageSurface>
       </FadeIn>
-    </div>
+    </CreatorToolsShell>
   );
 }

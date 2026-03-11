@@ -32,11 +32,17 @@ test("design ops client archives completed runs and renders a findings archive",
   assert.match(archiveList, /without rerunning Atlas and Beacon/);
 });
 
-test("design ops timeline uses stronger typography hierarchy for synthesis output", () => {
+test("design ops timeline uses labeled token-scale sections for synthesis output", () => {
   const timeline = read("components/design/design-ops-timeline.tsx");
+  const formatting = read("lib/design-ops-formatting.ts");
 
-  assert.match(timeline, /text-lg font-black tracking-tight/);
-  assert.match(timeline, /text-\[15px\] leading-7/);
-  assert.match(timeline, /Recommended next step/);
-  assert.match(timeline, /tracking-\[0\.16em\]/);
+  assert.match(formatting, /export function formatPlainTextSections/);
+  assert.match(formatting, /FINDINGS|RECOMMENDATIONS|ASSUMPTIONS|SUBJECT/);
+  assert.match(formatting, /"Summary"/);
+  assert.match(formatting, /"Details"/);
+  assert.match(timeline, /formatPlainTextSections\(msg\.body\)/);
+  assert.match(timeline, /!isExpanded &&/);
+  assert.match(timeline, /Assumptions/);
+  assert.match(timeline, /text-\[10px\] font-semibold uppercase tracking-\[0\.16em\] text-muted-foreground/);
+  assert.match(timeline, /text-xs leading-5 text-foreground\/85/);
 });

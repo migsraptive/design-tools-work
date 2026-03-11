@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Brain, FlaskConical } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  formatPlainTextSections,
+  toPlainText,
+} from "@/lib/design-ops-formatting";
 import { cn } from "@/lib/utils";
 import type { AgentMessage } from "@/lib/design-ops-types";
 
@@ -36,6 +40,10 @@ const CONFIDENCE_STYLES: Record<string, string> = {
 };
 
 export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(
+    () => new Set()
+  );
+
   if (messages.length === 0) {
     return (
       <div className="text-center py-12">
@@ -47,98 +55,156 @@ export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {messages.map((msg, i) => {
         const agent = AGENT_CONFIG[msg.from] || AGENT_CONFIG.design_ops_manager;
         const Icon = agent.icon;
         const isLast = i === messages.length - 1;
+        const recipient =
+          msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to;
+        const body = toPlainText(msg.body);
+        const bodySections = formatPlainTextSections(msg.body);
+        const assumptions = toPlainText(msg.assumptions);
+        const nextStep = toPlainText(msg.nextStep);
+        const preview = body.replace(/\s+/g, " ").trim();
+        const hasDetails =
+          preview.length > 120 || Boolean(assumptions || nextStep);
+        const isExpanded = expandedIndices.has(i);
 
         return (
-          <div key={i} className="relative">
+          <div key={i} className="relative pl-10">
             {/* Timeline connector */}
             {!isLast && (
-              <div className="absolute left-5 top-12 bottom-0 w-px bg-border" />
+              <div className="absolute left-3 top-8 bottom-[-0.75rem] w-px bg-border/70" />
             )}
 
-            <Card className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <CardHeader className="py-3 px-4">
-                <div className="flex items-start gap-3">
-                  {/* Agent avatar */}
-                  <div className={cn("size-10 rounded-lg bg-muted flex items-center justify-center shrink-0", agent.color)}>
-                    <Icon className="size-5" />
+            <div
+              className={cn(
+                "absolute left-0 top-1.5 flex size-6 items-center justify-center rounded-md bg-muted/60",
+                agent.color
+              )}
+            >
+              <Icon className="size-3.5" />
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-lg border border-border/60 bg-card/60 px-3 py-2 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] leading-4">
+                    <span
+                      className={cn(
+                        "font-semibold uppercase tracking-[0.18em]",
+                        agent.color
+                      )}
+                    >
+                      {msg.fromName || agent.label}
+                    </span>
+                    <span className="text-muted-foreground">{agent.role}</span>
+                    <span className="text-muted-foreground">→ {recipient}</span>
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    {/* Agent name + badges */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={cn(
-                          "text-[11px] font-semibold uppercase tracking-[0.16em]",
-                          agent.color
-                        )}
-                      >
-                        {msg.fromName || agent.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        · {agent.role}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        → {msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to}
-                      </span>
+                  <div className="flex items-start gap-2">
+                    <p className="min-w-0 flex-1 text-sm font-semibold tracking-tight leading-5 text-foreground">
+                      {msg.subject}
+                    </p>
+                    <div className="flex shrink-0 items-center gap-1">
                       {msg.confidence !== "n/a" && (
                         <Badge
                           variant="outline"
-                          className={cn("text-2xs px-1.5 py-0", CONFIDENCE_STYLES[msg.confidence])}
+                          className={cn(
+                            "h-4 rounded-sm px-1 text-[9px] font-medium uppercase tracking-[0.12em]",
+                            CONFIDENCE_STYLES[msg.confidence]
+                          )}
                         >
                           {msg.confidence}
                         </Badge>
                       )}
                       {msg.priority === "critical" && (
-                        <Badge variant="destructive" className="text-2xs px-1.5 py-0">
+                        <Badge
+                          variant="destructive"
+                          className="h-4 rounded-sm px-1 text-[9px] font-medium uppercase tracking-[0.12em]"
+                        >
                           critical
                         </Badge>
                       )}
                     </div>
-
-                    {/* Subject */}
-                    <CardTitle className="mt-1 text-lg font-black tracking-tight leading-6">
-                      {msg.subject}
-                    </CardTitle>
                   </div>
+
+                  {!isExpanded && (
+                    <p className="line-clamp-1 text-xs leading-5 text-muted-foreground">
+                      {preview}
+                    </p>
+                  )}
+
+                  {isExpanded && (
+                    <div className="space-y-3 border-t border-border/50 pt-2">
+                      {bodySections.map((section) => (
+                        <div key={section.label} className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            {section.label}
+                          </p>
+                          <div className="space-y-1">
+                            {section.content.map((line, index) => (
+                              <p
+                                key={`${section.label}-${index}`}
+                                className="text-xs leading-5 text-foreground/85"
+                              >
+                                {line}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+
+                      {assumptions && (
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            Assumptions
+                          </p>
+                          <p className="text-xs leading-5 text-muted-foreground">
+                            {assumptions}
+                          </p>
+                        </div>
+                      )}
+                      {nextStep && (
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                            Next
+                          </p>
+                          <p className="text-xs leading-5 text-foreground/85">
+                            {nextStep}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </CardHeader>
 
-              <CardContent className="px-4 pb-4 pt-0 ml-[52px]">
-                {/* Body */}
-                <div className="text-[15px] leading-7 text-foreground/90 whitespace-pre-wrap">
-                  {msg.body}
-                </div>
-
-                {/* Assumptions */}
-                {msg.assumptions && (
-                  <details className="mt-4 rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
-                    <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground">
-                      Assumptions
-                    </summary>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {msg.assumptions}
-                    </p>
-                  </details>
+                {hasDetails && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExpandedIndices((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(i)) {
+                          next.delete(i);
+                        } else {
+                          next.add(i);
+                        }
+                        return next;
+                      });
+                    }}
+                    className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {isExpanded ? "Less" : "More"}
+                  </button>
                 )}
+              </div>
 
-                {/* Next step */}
-                {msg.nextStep && (
-                  <div className="mt-4 border-t border-border/70 pt-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      Recommended next step
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-foreground/80">
-                      {msg.nextStep}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              {!hasDetails && preview.length === 0 && (
+                <div className="text-xs text-muted-foreground">No details provided.</div>
+              )}
+            </div>
           </div>
         );
       })}

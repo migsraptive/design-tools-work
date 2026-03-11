@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import re
 import uuid
 from datetime import datetime
 
@@ -12,6 +13,18 @@ from sse_starlette.sse import EventSourceResponse
 load_dotenv()
 
 app = FastAPI(title="Design Ops Crew API")
+
+
+def plain_text(value: str) -> str:
+    result = re.sub(r"^#{1,6}\s+", "", value, flags=re.MULTILINE)
+    result = re.sub(r"^\s*[-*+]\s+", "", result, flags=re.MULTILINE)
+    result = re.sub(r"^\s*\d+\.\s+", "", result, flags=re.MULTILINE)
+    result = re.sub(r"\*\*(.*?)\*\*", r"\1", result)
+    result = re.sub(r"\*(.*?)\*", r"\1", result)
+    result = re.sub(r"`([^`]+)`", r"\1", result)
+    result = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", result)
+    result = re.sub(r"\n{3,}", "\n\n", result)
+    return result.strip()
 
 
 @app.get("/health")
@@ -111,7 +124,7 @@ async def run_crew(request: Request):
                     "priority": "standard",
                     "confidence": "medium",
                     "assumptions": "Analysis based on available observations and session data.",
-                    "body": result,
+                    "body": plain_text(result),
                     "next_step": "Review findings and consider prototyping recommendations.",
                     "timestamp": datetime.now().isoformat(),
                 }),

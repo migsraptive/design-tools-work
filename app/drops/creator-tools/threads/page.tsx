@@ -1,20 +1,35 @@
 import Link from "next/link";
-import { ArrowRight, MessageSquareQuote } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  MessageSquareQuote,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { CreatorToolsShell } from "@/components/design/creator-tools-shell";
+import { CreatorToolsPageSurface } from "@/components/design/creator-tools-page-surface";
+import { CreatorToolsInsightBlock } from "@/components/design/creator-tools-insight-block";
+import { CreatorToolsMetricCard } from "@/components/design/creator-tools-metric-card";
+import { CreatorToolsRankBadge } from "@/components/design/creator-tools-rank-badge";
 import { SectionFeedback } from "@/components/design/section-feedback";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { threadSignals, topPosts } from "@/lib/mock/creator-tools";
 import { creatorToolsFeedbackId } from "@/lib/mock/creator-tools-feedback";
+
+const threadSignalIcons = {
+  "High-signal question cluster": AlertCircle,
+  "Audience reactivation": Users,
+  "Pinning opportunity": TrendingUp,
+} as const;
 
 export default function CreatorToolsThreadsPage() {
   return (
     <CreatorToolsShell
       badge="Threads"
       title="Conversation Signals"
-      description="The posts, replies, and discussion clusters behind the strongest community patterns."
+      description="The posts, replies, and discussion clusters that prove whether a creator should show up right now."
     >
-      <section className="overflow-hidden rounded-[32px] border border-border/70 bg-card shadow-sm">
+      <CreatorToolsPageSurface>
         <div className="border-b border-border/60 px-6 py-5 md:px-8">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -25,9 +40,10 @@ export default function CreatorToolsThreadsPage() {
               <h2 className="mt-2 text-2xl font-black tracking-tight md:text-3xl">
                 Supporting Evidence
               </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                These conversations explain the strongest patterns in the community and
-                show where the current momentum is taking shape.
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Threads are where signal becomes a real participation decision. This
+                view helps the team separate broad momentum from the specific
+                conversations that are actually worth a creator response.
               </p>
             </div>
             <Button asChild variant="outline" className="rounded-full">
@@ -39,32 +55,40 @@ export default function CreatorToolsThreadsPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 p-6 xl:grid-cols-[1.05fr_0.95fr] md:p-8">
+        <div className="grid gap-4 p-6 2xl:grid-cols-2 md:p-8">
           <div className="rounded-[28px] border border-border/60 bg-background/90 p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
               Breakout conversations
             </p>
             <div className="mt-4 space-y-3">
-              {threadSignals.map((thread) => (
-                <div
-                  key={thread.title}
-                  className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
-                >
-                  <Link href={thread.href} className="block transition-colors hover:text-foreground">
-                    <Badge variant="outline" className="rounded-full px-3 py-1">
-                      {thread.signal}
-                    </Badge>
-                    <p className="mt-3 text-sm font-semibold">{thread.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{thread.body}</p>
-                  </Link>
-                  <SectionFeedback
-                    page="threads"
-                    targetType="thread"
-                    targetId={creatorToolsFeedbackId("threads", "thread", thread.title)}
-                    className="mt-4"
-                  />
-                </div>
-              ))}
+              {threadSignals.map((thread) => {
+                const ThreadIcon =
+                  threadSignalIcons[thread.signal as keyof typeof threadSignalIcons] ??
+                  MessageSquareQuote;
+
+                return (
+                  <div
+                    key={thread.title}
+                    className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
+                  >
+                    <Link href={thread.href} className="block transition-colors hover:text-foreground">
+                      <CreatorToolsInsightBlock
+                        badge={thread.signal}
+                        icon={ThreadIcon}
+                        insight={thread.body}
+                        supportingLabel="Supporting thread"
+                        supportingText={thread.title}
+                      />
+                    </Link>
+                    <SectionFeedback
+                      page="threads"
+                      targetType="thread"
+                      targetId={creatorToolsFeedbackId("threads", "thread", thread.title)}
+                      className="mt-4"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -79,15 +103,22 @@ export default function CreatorToolsThreadsPage() {
                   className="rounded-2xl border border-border/60 bg-secondary/25 p-4"
                 >
                   <Link href={post.href} className="block transition-colors hover:text-foreground">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">{post.title}</p>
-                      <Badge variant="outline" className="rounded-full px-3 py-1 text-[10px]">
-                        #{index + 1}
-                      </Badge>
+                    <div className="flex items-start gap-3">
+                      <CreatorToolsRankBadge rank={index + 1} className="mt-0.5 shrink-0" />
+                      <p className="pt-0.5 text-sm font-semibold leading-6">{post.title}</p>
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {post.views.toLocaleString()} views • {post.engagement}% engagement
-                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <CreatorToolsMetricCard
+                        label="Views"
+                        value={post.views.toLocaleString()}
+                        tone="Performance"
+                      />
+                      <CreatorToolsMetricCard
+                        label="Engagement"
+                        value={`${post.engagement}%`}
+                        tone="Participation"
+                      />
+                    </div>
                   </Link>
                   <SectionFeedback
                     page="threads"
@@ -100,7 +131,7 @@ export default function CreatorToolsThreadsPage() {
             </div>
           </div>
         </div>
-      </section>
+      </CreatorToolsPageSurface>
     </CreatorToolsShell>
   );
 }
