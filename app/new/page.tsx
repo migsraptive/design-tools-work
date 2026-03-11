@@ -16,9 +16,11 @@ import { cn } from "@/lib/utils";
 import { useSessions } from "@/lib/design-store";
 import { useAdmin } from "@/hooks/use-admin";
 import { generateId } from "@/lib/design-utils";
-import type { MediaType } from "@/lib/design-types";
+import type { MediaType, SessionValidation } from "@/lib/design-types";
 import { Button } from "@/components/ui/button";
 import { DraftOptionCard } from "@/components/design/draft-option-card";
+import { SessionBriefInputs } from "@/components/design/session-brief-inputs";
+import { SessionValidationFields } from "@/components/design/session-validation-fields";
 
 interface OptionDraft {
   key: string;
@@ -56,6 +58,9 @@ export default function NewSessionPage() {
   const [goal, setGoal] = useState("");
   const [audience, setAudience] = useState("");
   const [constraints, setConstraints] = useState("");
+  const [validation, setValidation] = useState<SessionValidation>({
+    state: "unverified",
+  });
 
   // Options
   const [options, setOptions] = useState<OptionDraft[]>([
@@ -101,7 +106,8 @@ export default function NewSessionPage() {
           goal: goal.trim() || undefined,
           audience: audience.trim() || undefined,
           constraints: constraints.trim() || undefined,
-        }
+        },
+        validation,
       );
       toast.success(`Created "${session.title}"`);
       router.push(`/explorations/${session.id}`);
@@ -139,7 +145,7 @@ export default function NewSessionPage() {
               className="text-2xl font-bold tracking-tight bg-transparent border-none outline-none placeholder:text-muted-foreground/40 w-full"
             />
             <textarea
-              placeholder="Brief description for voters..."
+              placeholder="Proposed solution or concept summary for voters..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={1}
@@ -164,28 +170,24 @@ export default function NewSessionPage() {
             />
           </button>
           {showBrief && (
-            <div className="grid gap-3 mt-8 grid-cols-1 sm:grid-cols-2 w-full">
-              {[
-                { key: "problem", label: "Problem", placeholder: "What problem does this solve?", value: problem, set: setProblem },
-                { key: "goal", label: "Goal", placeholder: "What's the desired outcome?", value: goal, set: setGoal },
-                { key: "audience", label: "Audience", placeholder: "Who is this for?", value: audience, set: setAudience },
-                { key: "constraints", label: "Constraints", placeholder: "Any limitations?", value: constraints, set: setConstraints },
-              ].map((field) => (
-                <div key={field.key} className="space-y-1">
-                  <div className="text-sm font-medium text-muted-foreground">
-                    {field.label}
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={field.placeholder}
-                    value={field.value}
-                    onChange={(e) => field.set(e.target.value)}
-                    className="text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground/30 w-full"
-                  />
-                </div>
-              ))}
+            <div className="mt-5">
+              <SessionBriefInputs
+                goal={goal}
+                problem={problem}
+                audience={audience}
+                constraints={constraints}
+                onGoalChange={setGoal}
+                onProblemChange={setProblem}
+                onAudienceChange={setAudience}
+                onConstraintsChange={setConstraints}
+                fieldClassName="text-sm bg-transparent border-none outline-none placeholder:text-muted-foreground/30 w-full"
+              />
             </div>
           )}
+        </div>
+
+        <div className="mt-8 rounded-xl border bg-muted/30 p-4">
+          <SessionValidationFields value={validation} onChange={setValidation} />
         </div>
       </div>
 

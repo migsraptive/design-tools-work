@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
-import { generateWithOllama, getModelName, parseOllamaJSON } from "@/lib/ollama";
+import {
+  generateSynthesisText,
+  getSynthesisModelName,
+  parseLLMJSON,
+} from "@/lib/synthesis-llm";
 import type {
   ObservationRow,
   SegmentRow,
@@ -104,24 +108,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Build prompt and call Ollama
+  // Build prompt and call configured synthesis provider
   const prompt = buildPrompt(observations, segments);
 
   let rawResponse: string;
   try {
-    rawResponse = await generateWithOllama(prompt);
+    rawResponse = await generateSynthesisText(prompt);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Ollama request failed";
+    const message = err instanceof Error ? err.message : "Synthesis request failed";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 
   let synthesis: ObservationSynthesisResponse;
   try {
-    synthesis = parseOllamaJSON<ObservationSynthesisResponse>(rawResponse);
+    synthesis = parseLLMJSON<ObservationSynthesisResponse>(rawResponse);
   } catch {
     return NextResponse.json(
       {
-        error: "Failed to parse Ollama response as JSON",
+        error: "Failed to parse synthesis response as JSON",
         raw: rawResponse.slice(0, 500),
       },
       { status: 502 }
@@ -180,7 +184,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     batchId,
-    model: getModelName(),
+    model: getSynthesisModelName(),
     insightCount: rows.length,
     newSegments: synthesis.suggested_segments.length,
   });

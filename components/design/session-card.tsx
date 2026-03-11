@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Trash2, Users, Layers } from "lucide-react";
 import type { ExplorationSession } from "@/lib/design-types";
 import { useSessions } from "@/lib/design-store";
+import { SessionCardBanner } from "@/components/design/session-card-banner";
 import {
   Card,
   CardHeader,
@@ -30,7 +31,15 @@ const phaseVariant: Record<
   revealed: "outline",
 };
 
-export function SessionCard({ session }: { session: ExplorationSession }) {
+export function SessionCard({
+  session,
+  scope,
+  canManage,
+}: {
+  session: ExplorationSession;
+  scope: "mine" | "all";
+  canManage: boolean;
+}) {
   const { deleteSession } = useSessions();
 
   return (
@@ -42,18 +51,21 @@ export function SessionCard({ session }: { session: ExplorationSession }) {
             {session.description}
           </CardDescription>
         </Link>
-        <CardAction>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() => deleteSession(session.id)}
-          >
-            <Trash2 className="size-3.5" />
-          </Button>
-        </CardAction>
+        {canManage ? (
+          <CardAction>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => deleteSession(session.id)}
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          </CardAction>
+        ) : null}
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <SessionCardBanner session={session} scope={scope} />
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
           <Badge variant={phaseVariant[session.phase]}>
             {phaseLabel[session.phase]}

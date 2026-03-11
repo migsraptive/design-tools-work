@@ -13,6 +13,7 @@ import {
   Lock,
   Unlock,
   FlaskConical,
+  Brain,
   PanelLeftClose,
   PanelLeft,
   Boxes,
@@ -46,6 +47,7 @@ export function DesignSidebar({
   const isProjects = pathname === "/" || pathname.startsWith("/explorations");
   const isInsights = pathname.startsWith("/research");
   const isCreatorTools = pathname.startsWith("/drops/creator-tools");
+  const isDesignOps = pathname.startsWith("/design-ops");
 
   const handleAdminToggle = async () => {
     if (isAdmin) {
@@ -61,6 +63,7 @@ export function DesignSidebar({
   const navItems = [
     { href: "/", icon: Layers, label: "Sessions", active: isProjects },
     { href: "/research", icon: FlaskConical, label: "Insights", active: isInsights },
+    { href: "/design-ops", icon: Brain, label: "Design Ops", active: isDesignOps },
   ];
 
   const projectDrops = [

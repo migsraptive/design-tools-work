@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Carrier
 
-## Getting Started
+Carrier is a private product-design workspace for exploration sessions, research synthesis, replay review, and project drops.
 
-First, run the development server:
+## Local Development
+
+Use the canonical repo path:
 
 ```bash
+cd /Users/miguelarias/cafemedia/design/carrier
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Carrier runs at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `http://localhost:3500`
+- `http://localhost:3500/drops/creator-tools`
+- `http://localhost:3500/seed`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Setup
 
-## Learn More
+Copy `.env.example` into your local env file and provide:
 
-To learn more about Next.js, take a look at the following resources:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `DESIGN_TOOLS_PASSWORD`
+- `SYNTHESIS_PROVIDER`
+- `OPENAI_API_KEY`
+- `OPENAI_API_BASE`
+- `OPENAI_SYNTHESIS_MODEL`
+- `CREW_API_URL`
+- `OLLAMA_BASE_URL`
+- `OLLAMA_MODEL`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Client-side reads use `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+Server-side API routes use `SUPABASE_SERVICE_ROLE_KEY` for writes and privileged reads.
+Session creator admin paths also rely on `DESIGN_TOOLS_PASSWORD`.
+Research synthesis routes use the shared synthesis provider config.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### OpenAI Synthesis + Crew
 
-## Deploy on Vercel
+Carrier now supports OpenAI-backed synthesis and Design Ops crew runs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Recommended defaults:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `SYNTHESIS_PROVIDER=openai`
+- `OPENAI_API_KEY=...`
+- `OPENAI_API_BASE=https://api.openai.com/v1`
+- `OPENAI_SYNTHESIS_MODEL=gpt-5.1-chat-latest`
+
+For the Crew service in `crew/.env`:
+
+- `CREW_MODEL_PROVIDER=openai`
+- `OPENAI_API_KEY=...`
+- `OPENAI_CREW_MODEL=gpt-5.1-codex-mini`
+- `CREW_API_URL=http://127.0.0.1:8000`
+
+This keeps the current Design Ops flow intact while swapping the underlying models:
+
+- synthesis routes -> ChatGPT-style model
+- crew agents -> Codex-style model
+
+### Ollama Fallback
+
+Carrier still supports a local Ollama fallback through [synthesis-llm.ts](/Users/miguelarias/cafemedia/design/carrier/lib/synthesis-llm.ts) and the Crew provider config.
+
+Recommended local defaults:
+
+- `OLLAMA_BASE_URL=http://localhost:11434`
+- `OLLAMA_MODEL=qwen2.5:7b`
+
+If you want to use Ollama again later:
+
+- set `SYNTHESIS_PROVIDER=ollama`
+- set `CREW_MODEL_PROVIDER=ollama`
+- keep `OLLAMA_BASE_URL` and `OLLAMA_MODEL` configured
+
+## Backend Decision
+
+Carrier stays on the existing Supabase project for now. The goal is to keep the current prototype stable and avoid a premature backend migration while feature work is still moving quickly.
+
+If ownership or access needs change later, migrate intentionally with the schema in `supabase/migrations` rather than switching credentials ad hoc.
+
+## Backend Notes
+
+See [docs/supabase-setup.md](/Users/miguelarias/cafemedia/design/carrier/docs/supabase-setup.md) for:
+
+- Supabase-backed feature inventory
+- migration/source-of-truth notes
+- future migration guidance for a work-owned project
