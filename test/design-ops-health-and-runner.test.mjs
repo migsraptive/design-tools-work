@@ -18,6 +18,7 @@ test("design ops health route mirrors provider-based crew health", () => {
   assert.match(runRoute, /127\.0\.0\.1:8000/);
   assert.match(route, /provider: data\.provider/);
   assert.match(route, /providerStatus: data\.provider_status/);
+  assert.match(route, /configuredModel: data\.configured_model/);
   assert.doesNotMatch(route, /ollama: data\.ollama/);
   assert.match(types, /provider\?: string;/);
   assert.match(types, /providerStatus\?: string;/);
@@ -31,10 +32,20 @@ test("design ops runner renders selectable objectives as wrapped stacked content
   assert.match(runner, /className="mt-1 rounded shrink-0"/);
   assert.match(runner, /<div className="min-w-0 space-y-1">/);
   assert.match(runner, /Target:<\/span>/);
+  assert.match(runner, /currentEvent === "run_start"/);
+  assert.match(runner, /subject: "Crew run started"/);
+  assert.match(runner, /currentEvent === "agent_start"/);
+  assert.match(runner, /\? "Atlas"/);
+  assert.match(runner, /\? "Beacon"/);
+  assert.match(runner, /subject: `\$\{agentName\} is working`/);
+  assert.match(runner, /split\(\/\\r\?\\n\\r\?\\n\/\)/);
+  assert.match(runner, /if \(buffer\.trim\(\)\)/);
+  assert.match(runner, /consumeEventChunk/);
   assert.match(runner, /if \(currentEvent === "error"\)/);
   assert.match(runner, /throw new Error\(streamError\);/);
   assert.match(runner, /disabled=\{running \|\| !prompt\.trim\(\)\}/);
   assert.doesNotMatch(runner, /crewUnavailable/);
   assert.doesNotMatch(runner, /Ollama not running/);
+  assert.doesNotMatch(runner, /Ollama/);
   assert.doesNotMatch(runner, /\{obj\.title\}: \{obj\.metric\} → \{obj\.target\}/);
 });

@@ -1,4 +1,4 @@
-crewai==1.10.1
+crewai[anthropic]==1.10.1
 litellm
 fastapi
 uvicorn[standard]

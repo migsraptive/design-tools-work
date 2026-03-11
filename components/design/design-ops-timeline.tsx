@@ -10,9 +10,22 @@ interface DesignOpsTimelineProps {
   messages: AgentMessage[];
 }
 
-const AGENT_CONFIG: Record<string, { icon: typeof Brain; color: string; label: string }> = {
-  design_ops_manager: { icon: Brain, color: "text-violet-400", label: "ORACLE" },
-  research_synthesizer: { icon: FlaskConical, color: "text-emerald-400", label: "MERIDIAN" },
+const AGENT_CONFIG: Record<
+  string,
+  { icon: typeof Brain; color: string; label: string; role: string }
+> = {
+  design_ops_manager: {
+    icon: Brain,
+    color: "text-violet-400",
+    label: "Atlas",
+    role: "Design Lead",
+  },
+  research_synthesizer: {
+    icon: FlaskConical,
+    color: "text-emerald-400",
+    label: "Beacon",
+    role: "Research Analyst",
+  },
 };
 
 const CONFIDENCE_STYLES: Record<string, string> = {
@@ -58,41 +71,56 @@ export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
                   <div className="flex-1 min-w-0">
                     {/* Agent name + badges */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn("text-xs font-bold uppercase tracking-wider", agent.color)}>
+                      <span
+                        className={cn(
+                          "text-[11px] font-semibold uppercase tracking-[0.16em]",
+                          agent.color
+                        )}
+                      >
                         {msg.fromName || agent.label}
                       </span>
-                      <span className="text-xs text-muted-foreground">→ {msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to}</span>
+                      <span className="text-xs text-muted-foreground">
+                        · {agent.role}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        → {msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to}
+                      </span>
                       {msg.confidence !== "n/a" && (
-                        <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", CONFIDENCE_STYLES[msg.confidence])}>
+                        <Badge
+                          variant="outline"
+                          className={cn("text-2xs px-1.5 py-0", CONFIDENCE_STYLES[msg.confidence])}
+                        >
                           {msg.confidence}
                         </Badge>
                       )}
                       {msg.priority === "critical" && (
-                        <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                        <Badge variant="destructive" className="text-2xs px-1.5 py-0">
                           critical
                         </Badge>
                       )}
                     </div>
 
                     {/* Subject */}
-                    <CardTitle className="text-sm font-medium mt-1">{msg.subject}</CardTitle>
+                    <CardTitle className="mt-1 text-lg font-black tracking-tight leading-6">
+                      {msg.subject}
+                    </CardTitle>
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent className="px-4 pb-4 pt-0 ml-[52px]">
                 {/* Body */}
-                <div className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                <div className="text-[15px] leading-7 text-foreground/90 whitespace-pre-wrap">
                   {msg.body}
                 </div>
 
                 {/* Assumptions */}
                 {msg.assumptions && (
-                  <details className="mt-3">
-                    <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+                  <details className="mt-4 rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
+                    <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground">
                       Assumptions
                     </summary>
-                    <p className="text-xs text-muted-foreground mt-1 pl-3 border-l-2 border-border">
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {msg.assumptions}
                     </p>
                   </details>
@@ -100,9 +128,14 @@ export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
 
                 {/* Next step */}
                 {msg.nextStep && (
-                  <p className="text-xs text-muted-foreground mt-3 italic">
-                    Next: {msg.nextStep}
-                  </p>
+                  <div className="mt-4 border-t border-border/70 pt-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      Recommended next step
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-foreground/80">
+                      {msg.nextStep}
+                    </p>
+                  </div>
                 )}
               </CardContent>
             </Card>

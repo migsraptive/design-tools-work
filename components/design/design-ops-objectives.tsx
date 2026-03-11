@@ -36,8 +36,13 @@ export function DesignOpsObjectives({
     setShowForm(false);
   };
 
+  const objectiveGridClass =
+    objectives.length <= 1
+      ? "grid grid-cols-1"
+      : "grid gap-4 md:grid-cols-2 xl:grid-cols-3";
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           Business Objectives
@@ -98,47 +103,51 @@ export function DesignOpsObjectives({
         </p>
       )}
 
-      {objectives.map((obj) => (
-        <Card key={obj.id} className="group">
-          <CardHeader className="py-3 px-4">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-start gap-2 min-w-0">
-                <Target className="size-4 mt-0.5 text-muted-foreground shrink-0" />
-                <div className="min-w-0">
-                  <CardTitle className="text-sm font-medium">{obj.title}</CardTitle>
-                  <div className="mt-1 flex flex-wrap items-start gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="max-w-full whitespace-normal break-words text-left leading-relaxed"
-                    >
-                      {obj.metric}
-                    </Badge>
+      {objectives.length > 0 && (
+        <div className={objectiveGridClass}>
+          {objectives.map((obj) => (
+            <Card key={obj.id} className="group h-full">
+              <CardHeader className="py-3 px-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2 min-w-0">
+                    <Target className="size-4 mt-0.5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <CardTitle className="text-sm font-medium">{obj.title}</CardTitle>
+                      <div className="mt-1 flex flex-wrap items-start gap-2">
+                        <Badge
+                          variant="secondary"
+                          className="max-w-full whitespace-normal break-words text-left leading-relaxed"
+                        >
+                          {obj.metric}
+                        </Badge>
+                      </div>
+                      {obj.target && (
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
+                          <span className="font-medium text-foreground/80">Target:</span>{" "}
+                          {obj.target}
+                        </p>
+                      )}
+                      {obj.description && (
+                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
+                          {obj.description}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  {obj.target && (
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
-                      <span className="font-medium text-foreground/80">Target:</span>{" "}
-                      {obj.target}
-                    </p>
-                  )}
-                  {obj.description && (
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
-                      {obj.description}
-                    </p>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity size-7 p-0"
+                    onClick={() => onDelete(obj.id)}
+                  >
+                    <Trash2 className="size-3.5 text-muted-foreground" />
+                  </Button>
                 </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="opacity-0 group-hover:opacity-100 transition-opacity size-7 p-0"
-                onClick={() => onDelete(obj.id)}
-              >
-                <Trash2 className="size-3.5 text-muted-foreground" />
-              </Button>
-            </div>
-          </CardHeader>
-        </Card>
-      ))}
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

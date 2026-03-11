@@ -1,27 +1,33 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Brain } from "lucide-react";
 import { toast } from "sonner";
 import { DesignOpsObjectives } from "@/components/design/design-ops-objectives";
 import { DesignOpsCrewRunner } from "@/components/design/design-ops-crew-runner";
 import { DesignOpsTimeline } from "@/components/design/design-ops-timeline";
-import { useAdmin } from "@/hooks/use-admin";
-import type { Objective, AgentMessage } from "@/lib/design-ops-types";
+import { DesignOpsArchiveList } from "@/components/design/design-ops-archive-list";
+import type {
+  Objective,
+  AgentMessage,
+  DesignOpsArchive,
+} from "@/lib/design-ops-types";
 
 export function DesignOpsClient() {
-  const { isAdmin } = useAdmin();
   const [objectives, setObjectives] = useState<Objective[]>([]);
   const [messages, setMessages] = useState<AgentMessage[]>([]);
+  const [archives, setArchives] = useState<DesignOpsArchive[]>([]);
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Load objectives
+  // Load objectives and archives
   useEffect(() => {
-    fetch("/api/design-ops/objectives")
-      .then((r) => r.json())
-      .then((data) => {
-        setObjectives(data);
+    Promise.all([
+      fetch("/api/design-ops/objectives").then((r) => r.json()),
+      fetch("/api/design-ops/archives").then((r) => r.json()),
+    ])
+      .then(([objectiveData, archiveData]) => {
+        setObjectives(objectiveData);
+        setArchives(archiveData);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -59,17 +65,29 @@ export function DesignOpsClient() {
     }
   }, []);
 
-  if (!isAdmin) {
-    return (
-      <div className="p-8 text-center">
-        <Brain className="size-12 text-muted-foreground mx-auto mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Design Ops</h2>
-        <p className="text-muted-foreground text-sm">
-          Admin access required. Click the lock icon in the sidebar to unlock.
-        </p>
-      </div>
-    );
-  }
+  const handleArchiveRun = useCallback(
+    async (payload: {
+      prompt: string;
+      objectives: Objective[];
+      messages: AgentMessage[];
+      provider?: string;
+      model?: string;
+    }) => {
+      try {
+        const res = await fetch("/api/design-ops/archives", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Failed to save synthesis");
+        const archive = await res.json();
+        setArchives((prev) => [archive, ...prev]);
+      } catch {
+        toast.error("Saved run was not archived");
+      }
+    },
+    []
+  );
 
   if (loading) {
     return (
@@ -81,7 +99,6 @@ export function DesignOpsClient() {
 
   return (
     <div className="p-6 space-y-8">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-black tracking-tight">Design Ops</h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -89,34 +106,37 @@ export function DesignOpsClient() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-        {/* Left sidebar — Objectives */}
-        <div className="space-y-6">
-          <DesignOpsObjectives
-            objectives={objectives}
-            onAdd={handleAddObjective}
-            onDelete={handleDeleteObjective}
-          />
-        </div>
+      <section className="space-y-6">
+        <DesignOpsObjectives
+          objectives={objectives}
+          onAdd={handleAddObjective}
+          onDelete={handleDeleteObjective}
+        />
+      </section>
 
-        {/* Main content — Runner + Timeline */}
-        <div className="space-y-6">
+      <section className="space-y-6">
+        <div className="max-w-4xl">
           <DesignOpsCrewRunner
             objectives={objectives}
             onMessages={setMessages}
             onRunStatusChange={setRunning}
+            onRunComplete={handleArchiveRun}
           />
-
-          {(messages.length > 0 || running) && (
-            <div>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                {running ? "Crew Activity" : "Results"}
-              </h3>
-              <DesignOpsTimeline messages={messages} />
-            </div>
-          )}
         </div>
-      </div>
+
+        {(messages.length > 0 || running) && (
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+              {running ? "Crew Activity" : "Results"}
+            </h3>
+            <DesignOpsTimeline messages={messages} />
+          </div>
+        )}
+      </section>
+
+      <section className="space-y-6">
+        <DesignOpsArchiveList archives={archives} />
+      </section>
     </div>
   );
 }

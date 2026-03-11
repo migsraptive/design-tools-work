@@ -212,7 +212,7 @@ components/design/design-sidebar.tsx      # Add "Design Ops" nav item
 - [x] `components/design/design-ops-timeline.tsx` — Agent message timeline:
   - Vertical timeline of cards, one per agent message
   - Each card shows:
-    - Agent avatar (icon) + name (ORACLE / MERIDIAN) + timestamp
+    - Agent avatar (icon) + name (Atlas / Beacon) + timestamp
     - Subject line as card heading
     - Confidence badge: `high` = green, `medium` = yellow, `low` = red
     - Priority badge if critical

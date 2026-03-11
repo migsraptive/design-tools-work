@@ -31,6 +31,16 @@ export interface CrewRun {
   completedAt?: string;
 }
 
+export interface DesignOpsArchive {
+  id: string;
+  prompt: string;
+  objectives: Objective[];
+  messages: AgentMessage[];
+  provider?: string;
+  model?: string;
+  createdAt: string;
+}
+
 export interface CrewHealthStatus {
   status: "ok" | "unavailable";
   provider?: string;

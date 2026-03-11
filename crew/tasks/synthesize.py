@@ -1,7 +1,12 @@
 from crewai import Task, Agent
 
 
-def create_synthesize_task(agent: Agent, prompt: str, objectives: list[dict]) -> Task:
+def create_synthesize_task(
+    agent: Agent,
+    prompt: str,
+    objectives: list[dict],
+    evidence_text: str,
+) -> Task:
     objectives_text = "\n".join(
         f"- {obj.get('title', '')}: {obj.get('metric', '')} → {obj.get('target', '')}"
         for obj in objectives
@@ -9,23 +14,23 @@ def create_synthesize_task(agent: Agent, prompt: str, objectives: list[dict]) ->
 
     return Task(
         description=(
-            f"You are Meridian, the User Research & Insight Analyst.\n\n"
+            f"You are Beacon, the Research Analyst.\n\n"
             f"ANALYSIS FOCUS: {prompt}\n\n"
             f"BUSINESS OBJECTIVES TO MAP AGAINST:\n{objectives_text}\n\n"
+            f"AVAILABLE EVIDENCE:\n{evidence_text}\n\n"
             f"Your job:\n"
-            f"1. Use the 'Fetch Research Evidence' tool to pull relevant observations, "
-            f"sessions, votes, and comments from the database\n"
-            f"2. Analyze the evidence using your two-pass method: what's in the data → what it likely means\n"
-            f"3. Map findings to the business objectives above\n"
-            f"4. Label every finding with a confidence level (High/Medium/Low)\n"
-            f"5. State assumptions explicitly\n"
-            f"6. End with concrete recommendations tied to specific objectives\n\n"
+            f"1. Analyze the evidence using your two-pass method: what's in the data → what it likely means\n"
+            f"2. Map findings to the business objectives above\n"
+            f"3. Label every finding with a confidence level (High/Medium/Low)\n"
+            f"4. State assumptions explicitly\n"
+            f"5. End with concrete recommendations tied to specific objectives\n\n"
             f"Rules:\n"
             f"- Ground synthesis in what the data actually says\n"
             f"- Flag inferences vs direct findings\n"
             f"- Distinguish pain points from satisficing (users adapting to broken things)\n"
             f"- A directional insight with stated assumptions is better than silence\n"
-            f"- Never fabricate evidence. If data is thin, say so."
+            f"- Never fabricate evidence. If data is thin, say so.\n"
+            f"- Do not call external tools. Work only with the evidence provided in this prompt."
         ),
         expected_output=(
             "A structured synthesis that includes:\n"
