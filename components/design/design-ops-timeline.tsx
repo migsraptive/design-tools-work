@@ -47,96 +47,107 @@ export function DesignOpsTimeline({ messages }: DesignOpsTimelineProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {messages.map((msg, i) => {
         const agent = AGENT_CONFIG[msg.from] || AGENT_CONFIG.design_ops_manager;
         const Icon = agent.icon;
         const isLast = i === messages.length - 1;
+        const recipient =
+          msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to;
 
         return (
-          <div key={i} className="relative">
+          <div key={i} className="relative pl-14">
             {/* Timeline connector */}
             {!isLast && (
-              <div className="absolute left-5 top-12 bottom-0 w-px bg-border" />
+              <div className="absolute left-5 top-11 bottom-[-0.75rem] w-px bg-border" />
             )}
 
+            <div
+              className={cn(
+                "absolute left-0 top-3 flex size-10 items-center justify-center rounded-lg bg-muted",
+                agent.color
+              )}
+            >
+              <Icon className="size-5" />
+            </div>
+
             <Card className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <CardHeader className="py-3 px-4">
-                <div className="flex items-start gap-3">
-                  {/* Agent avatar */}
-                  <div className={cn("size-10 rounded-lg bg-muted flex items-center justify-center shrink-0", agent.color)}>
-                    <Icon className="size-5" />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    {/* Agent name + badges */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span
-                        className={cn(
-                          "text-[11px] font-semibold uppercase tracking-[0.16em]",
-                          agent.color
-                        )}
-                      >
-                        {msg.fromName || agent.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        · {agent.role}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        → {msg.to === "user" ? "You" : AGENT_CONFIG[msg.to]?.label || msg.to}
-                      </span>
-                      {msg.confidence !== "n/a" && (
-                        <Badge
-                          variant="outline"
-                          className={cn("text-2xs px-1.5 py-0", CONFIDENCE_STYLES[msg.confidence])}
-                        >
-                          {msg.confidence}
-                        </Badge>
+              <CardHeader className="px-4 py-3">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span
+                    className={cn(
+                      "text-[11px] font-semibold uppercase tracking-[0.16em]",
+                      agent.color
+                    )}
+                  >
+                    {msg.fromName || agent.label}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {agent.role}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    → {recipient}
+                  </span>
+                  {msg.confidence !== "n/a" && (
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "h-5 rounded-md px-1.5 text-[10px]",
+                        CONFIDENCE_STYLES[msg.confidence]
                       )}
-                      {msg.priority === "critical" && (
-                        <Badge variant="destructive" className="text-2xs px-1.5 py-0">
-                          critical
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Subject */}
-                    <CardTitle className="mt-1 text-lg font-black tracking-tight leading-6">
-                      {msg.subject}
-                    </CardTitle>
-                  </div>
+                    >
+                      {msg.confidence}
+                    </Badge>
+                  )}
+                  {msg.priority === "critical" && (
+                    <Badge
+                      variant="destructive"
+                      className="h-5 rounded-md px-1.5 text-[10px]"
+                    >
+                      critical
+                    </Badge>
+                  )}
                 </div>
+
+                <CardTitle className="text-base font-black tracking-tight leading-5">
+                  {msg.subject}
+                </CardTitle>
               </CardHeader>
 
-              <CardContent className="px-4 pb-4 pt-0 ml-[52px]">
-                {/* Body */}
-                <div className="text-[15px] leading-7 text-foreground/90 whitespace-pre-wrap">
-                  {msg.body}
-                </div>
+              <CardContent className="px-4 pb-3 pt-0">
+                <div className="space-y-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm leading-6 text-foreground/90 whitespace-pre-wrap">
+                      {msg.body}
+                    </div>
 
-                {/* Assumptions */}
-                {msg.assumptions && (
-                  <details className="mt-4 rounded-xl border border-border/70 bg-muted/20 px-4 py-3">
-                    <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground">
-                      Assumptions
-                    </summary>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {msg.assumptions}
-                    </p>
-                  </details>
-                )}
+                    {(msg.assumptions || msg.nextStep) && (
+                      <div className="flex flex-col gap-1.5 border-t border-border/60 pt-2 text-xs leading-5">
+                        {msg.assumptions && (
+                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                            <span className="font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                              Assumptions
+                            </span>
+                            <span className="text-muted-foreground">
+                              {msg.assumptions}
+                            </span>
+                          </div>
+                        )}
 
-                {/* Next step */}
-                {msg.nextStep && (
-                  <div className="mt-4 border-t border-border/70 pt-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      Recommended next step
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-foreground/80">
-                      {msg.nextStep}
-                    </p>
+                        {msg.nextStep && (
+                          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                            <span className="font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                              Next
+                            </span>
+                            <span className="text-foreground/80">
+                              {msg.nextStep}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </CardContent>
             </Card>
           </div>
