@@ -3,6 +3,7 @@ import { promises as fs } from "fs";
 import path from "path";
 
 const FILE_PATH = path.join(process.cwd(), "data", "objectives.json");
+const FILE_DIR = path.dirname(FILE_PATH);
 
 async function readObjectives() {
   try {
@@ -14,6 +15,7 @@ async function readObjectives() {
 }
 
 async function writeObjectives(objectives: unknown[]) {
+  await fs.mkdir(FILE_DIR, { recursive: true });
   await fs.writeFile(FILE_PATH, JSON.stringify(objectives, null, 2));
 }
 

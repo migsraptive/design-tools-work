@@ -1,3 +1,5 @@
+import type { DataConfidenceState } from "@/lib/data-confidence";
+
 export type Phase = "setup" | "voting" | "revealed";
 
 export type MediaType = "none" | "image" | "figma-embed" | "excalidraw";
@@ -58,6 +60,14 @@ export interface Vote {
   participantName?: string;
 }
 
+export interface SessionValidation {
+  state: DataConfidenceState;
+  note?: string;
+  evidenceSourceOwner?: string;
+  evidenceSourceOrigin?: string;
+  evidenceSourceDate?: string;
+}
+
 export interface ExplorationSession {
   id: string;
   title: string;
@@ -74,6 +84,7 @@ export interface ExplorationSession {
   phase: Phase;
   creatorToken: string;
   createdAt: number;
+  validation?: SessionValidation;
 }
 
 // --- Supabase row types (snake_case, matching DB columns) ---

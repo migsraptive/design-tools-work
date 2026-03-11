@@ -33,7 +33,8 @@ export interface CrewRun {
 
 export interface CrewHealthStatus {
   status: "ok" | "unavailable";
-  ollama: string;
+  provider?: string;
+  providerStatus?: string;
   models: string[];
   configuredModel: string;
 }

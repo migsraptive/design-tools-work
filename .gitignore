@@ -44,6 +44,7 @@ next-env.d.ts
 
 # crew (python microservice)
 crew/venv/
+crew/venv*/
 crew/.env
 data/objectives.json
 __pycache__/

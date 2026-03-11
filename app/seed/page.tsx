@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { saveSessionValidation } from "@/lib/session-validation-storage";
 
 const CREATOR_TOKENS_KEY = "design-creator-tokens";
 
@@ -105,6 +106,13 @@ async function seedRevealed(setStatus: (s: string) => void): Promise<string> {
   });
 
   saveCreatorToken(sessionId, creatorToken);
+  saveSessionValidation(sessionId, {
+    state: "confirmed",
+    evidenceSourceOwner: "Miguel Arias",
+    evidenceSourceOrigin: "Pricing experiment readout",
+    evidenceSourceDate: "2026-03-10",
+    note: "Conversion and support-ticket trends were verified against the latest internal review before sharing.",
+  });
 
   // Start voting
   await apiPatch(`/api/design/sessions/${sessionId}`, {
@@ -203,6 +211,13 @@ async function seedVoting(setStatus: (s: string) => void): Promise<string> {
   });
 
   saveCreatorToken(sessionId, creatorToken);
+  saveSessionValidation(sessionId, {
+    state: "in_review",
+    evidenceSourceOwner: "Growth PM",
+    evidenceSourceOrigin: "Onboarding funnel snapshot",
+    evidenceSourceDate: "2026-03-09",
+    note: "Directional signal is strong, but the completion-rate cut still needs analytics review before it becomes a drop anchor.",
+  });
 
   // Start voting
   await apiPatch(`/api/design/sessions/${sessionId}`, {
@@ -280,6 +295,13 @@ async function seedSetup(setStatus: (s: string) => void): Promise<string> {
   });
 
   saveCreatorToken(sessionId, creatorToken);
+  saveSessionValidation(sessionId, {
+    state: "unverified",
+    evidenceSourceOwner: "Design",
+    evidenceSourceOrigin: "Exploration brief",
+    evidenceSourceDate: "2026-03-08",
+    note: "Useful for comparison work, but not yet grounded in a confirmed data source.",
+  });
 
   // Stay in setup phase — shows creator controls, participant count stepper, Add Option button
   return sessionId;

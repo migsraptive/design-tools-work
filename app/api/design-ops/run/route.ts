@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const CREW_API_URL = process.env.CREW_API_URL || "http://localhost:8000";
+const CREW_API_URL = process.env.CREW_API_URL || "http://127.0.0.1:8000";
 
 export async function POST(request: Request) {
   const body = await request.json();

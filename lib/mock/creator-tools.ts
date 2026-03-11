@@ -1,3 +1,5 @@
+import type { DataConfidenceMeta } from "@/lib/data-confidence";
+
 export const creatorToolsNav = [
   { href: "/drops/creator-tools", label: "Overview" },
   { href: "/drops/creator-tools/themes", label: "Themes" },
@@ -6,6 +8,80 @@ export const creatorToolsNav = [
   { href: "/drops/creator-tools/actions", label: "Actions" },
 ];
 
+export const creatorToolsModules = [
+  {
+    title: "Themes",
+    href: "/drops/creator-tools/themes",
+    summary:
+      "See the topics creating the most momentum so the team understands what is broadly resonating before chasing individual moments.",
+    cue: "Start here when the question is what is moving overall.",
+    status: "Signal layer",
+  },
+  {
+    title: "Audience",
+    href: "/drops/creator-tools/audience",
+    summary:
+      "Translate those themes into concrete reader segments and returning behavior so the team knows who is worth designing for next.",
+    cue: "Use this when you need to connect topics to people.",
+    status: "Segment layer",
+  },
+  {
+    title: "Threads",
+    href: "/drops/creator-tools/threads",
+    summary:
+      "Move from broad signal into the actual conversations driving engagement, unresolved questions, and creator participation opportunities.",
+    cue: "Go here when you need to inspect the live conversation surface.",
+    status: "Conversation layer",
+  },
+  {
+    title: "Actions",
+    href: "/drops/creator-tools/actions",
+    summary:
+      "Turn signal into next steps by prioritizing creator follow-through, publishing moves, and response opportunities.",
+    cue: "This is where decision-making and execution come together.",
+    status: "Decision layer",
+  },
+] as const;
+
+export const creatorToolsSupportingSurfaces = [
+  {
+    title: "Publishing Controls",
+    href: "/drops/creator-tools/controls",
+    summary:
+      "Scheduling, pinning, moderation, and delegated publishing support execution after an action has already been prioritized.",
+  },
+  {
+    title: "Response Prompts",
+    href: "/drops/creator-tools/nudges",
+    summary:
+      "Prompt patterns and timing cues support follow-through, but they should reinforce Actions rather than compete with it in the IA.",
+  },
+] as const;
+
+export const creatorToolsConfidenceSummary = {
+  anchor: {
+    state: "confirmed",
+    label: "Confirmed evidence anchor",
+    source: "Weekly analytics export + community activity snapshot",
+    owner: "Data partner",
+    verifiedAt: "March 10, 2026",
+  } satisfies DataConfidenceMeta,
+  statuses: [
+    {
+      state: "confirmed",
+      label: "4 confirmed",
+    },
+    {
+      state: "in_review",
+      label: "2 in review",
+    },
+    {
+      state: "unverified",
+      label: "1 unverified",
+    },
+  ] as const,
+};
+
 export const overviewFindings = [
   {
     title: "Meal prep is becoming the community's anchor topic",
@@ -13,6 +89,13 @@ export const overviewFindings = [
       "Conversation depth and repeat visits are compounding around practical prep systems rather than one-off recipes.",
     href: "/drops/creator-tools/themes",
     cta: "Explore themes",
+    confidence: {
+      state: "confirmed",
+      label: "Confirmed",
+      source: "Topic clustering + repeat visit trend",
+      owner: "Miguel",
+      verifiedAt: "March 10, 2026",
+    } satisfies DataConfidenceMeta,
   },
   {
     title: "Reactivated readers are clustering around budget advice",
@@ -20,6 +103,13 @@ export const overviewFindings = [
       "Members who had gone quiet are showing up again when threads connect meal planning to savings and routine.",
     href: "/drops/creator-tools/audience",
     cta: "See audience segments",
+    confidence: {
+      state: "in_review",
+      label: "In Review",
+      source: "Reader return cohort draft",
+      owner: "Miguel",
+      note: "Needs final QA against source cohort definition.",
+    } satisfies DataConfidenceMeta,
   },
   {
     title: "One thread is carrying an outsized share of community momentum",
@@ -27,6 +117,13 @@ export const overviewFindings = [
       "The top meal-prep thread is pulling comments, creator mentions, and unresolved questions that can still be acted on.",
     href: "/drops/creator-tools/threads",
     cta: "Open threads",
+    confidence: {
+      state: "unverified",
+      label: "Unverified",
+      source: "Manual thread scan",
+      owner: "Miguel",
+      note: "Directional only until thread counts are reconciled.",
+    } satisfies DataConfidenceMeta,
   },
 ];
 
@@ -37,6 +134,13 @@ export const analyticsKpis = [
     delta: "+12%",
     detail: "7-day pageview growth",
     tone: "positive" as const,
+    confidence: {
+      state: "confirmed",
+      label: "Confirmed",
+      source: "Weekly analytics export",
+      owner: "Data partner",
+      verifiedAt: "March 10, 2026",
+    } satisfies DataConfidenceMeta,
   },
   {
     label: "Active participants",
@@ -44,6 +148,13 @@ export const analyticsKpis = [
     delta: "+8%",
     detail: "commented, reacted, or revisited",
     tone: "positive" as const,
+    confidence: {
+      state: "in_review",
+      label: "In Review",
+      source: "Community activity rollup",
+      owner: "Miguel",
+      note: "Awaiting duplicate-user check.",
+    } satisfies DataConfidenceMeta,
   },
   {
     label: "Response coverage",
@@ -51,6 +162,13 @@ export const analyticsKpis = [
     delta: "14 open",
     detail: "high-signal threads still waiting",
     tone: "neutral" as const,
+    confidence: {
+      state: "confirmed",
+      label: "Confirmed",
+      source: "Thread response audit",
+      owner: "Miguel",
+      verifiedAt: "March 10, 2026",
+    } satisfies DataConfidenceMeta,
   },
   {
     label: "Best posting window",
@@ -58,6 +176,13 @@ export const analyticsKpis = [
     delta: "8-10 AM",
     detail: "peak click-through and replies",
     tone: "neutral" as const,
+    confidence: {
+      state: "unverified",
+      label: "Unverified",
+      source: "Directional posting pattern sample",
+      owner: "Miguel",
+      note: "Useful for exploration, not yet validated.",
+    } satisfies DataConfidenceMeta,
   },
 ];
 

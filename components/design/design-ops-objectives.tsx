@@ -61,7 +61,7 @@ export function DesignOpsObjectives({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Input
                 placeholder="Metric (e.g., Activation rate)"
                 value={metric}
@@ -71,7 +71,7 @@ export function DesignOpsObjectives({
                 placeholder="Target (e.g., 50%)"
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
-                className="w-28"
+                className="sm:w-28"
               />
             </div>
             <Textarea
@@ -106,16 +106,24 @@ export function DesignOpsObjectives({
                 <Target className="size-4 mt-0.5 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
                   <CardTitle className="text-sm font-medium">{obj.title}</CardTitle>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className="text-xs">
+                  <div className="mt-1 flex flex-wrap items-start gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="max-w-full whitespace-normal break-words text-left leading-relaxed"
+                    >
                       {obj.metric}
                     </Badge>
-                    {obj.target && (
-                      <span className="text-xs text-muted-foreground">→ {obj.target}</span>
-                    )}
                   </div>
+                  {obj.target && (
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
+                      <span className="font-medium text-foreground/80">Target:</span>{" "}
+                      {obj.target}
+                    </p>
+                  )}
                   {obj.description && (
-                    <p className="text-xs text-muted-foreground mt-1">{obj.description}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground break-words">
+                      {obj.description}
+                    </p>
                   )}
                 </div>
               </div>

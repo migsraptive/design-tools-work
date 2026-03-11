@@ -7,12 +7,24 @@ from tools import fetch_evidence
 
 def get_llm() -> LLM:
     import os
+    provider = os.environ.get("CREW_MODEL_PROVIDER")
+    if provider not in {"openai", "ollama"}:
+        provider = "openai" if os.environ.get("OPENAI_API_KEY") else "ollama"
+
+    if provider == "openai":
+        model = os.environ.get("OPENAI_CREW_MODEL", "gpt-5.1-codex-mini")
+        kwargs = {
+            "model": f"openai/{model}",
+            "api_key": os.environ.get("OPENAI_API_KEY"),
+        }
+        base_url = os.environ.get("OPENAI_API_BASE")
+        if base_url:
+            kwargs["base_url"] = base_url
+        return LLM(**kwargs)
+
     model = os.environ.get("OLLAMA_MODEL", "qwen3.5")
     base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-    return LLM(
-        model=f"ollama/{model}",
-        base_url=base_url,
-    )
+    return LLM(model=f"ollama/{model}", base_url=base_url)
 
 
 def run_crew(prompt: str, objectives: list[dict]) -> str:

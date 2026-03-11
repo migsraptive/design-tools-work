@@ -30,9 +30,7 @@ export function DesignOpsCrewRunner({
     fetch("/api/design-ops/health")
       .then((r) => r.json())
       .then(setHealth)
-      .catch(() =>
-        setHealth({ status: "unavailable", ollama: "unknown", models: [], configuredModel: "unknown" })
-      );
+      .catch(() => setHealth(null));
   }, []);
 
   // Sync selected objectives when new ones are added
@@ -82,21 +80,35 @@ export function DesignOpsCrewRunner({
       const decoder = new TextDecoder();
       const messages: AgentMessage[] = [];
       let buffer = "";
+      let currentEvent = "";
+      let streamError: string | null = null;
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
+        const events = buffer.split("\n\n");
+        buffer = events.pop() || "";
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
+        for (const eventChunk of events) {
+          const lines = eventChunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("event: ")) {
+              currentEvent = line.slice(7).trim();
+            }
+
+            if (!line.startsWith("data: ")) continue;
+
             try {
               const data = JSON.parse(line.slice(6));
-              // Check if this is an agent_message event
-              if (data.from && data.body) {
+              if (currentEvent === "error") {
+                streamError = data.error || "Crew run failed";
+                continue;
+              }
+
+              if (currentEvent === "agent_message" && data.from && data.body) {
                 const msg: AgentMessage = {
                   from: data.from,
                   fromName: data.from_name || data.fromName || "",
@@ -116,7 +128,13 @@ export function DesignOpsCrewRunner({
               // Skip non-JSON lines
             }
           }
+
+          currentEvent = "";
         }
+      }
+
+      if (streamError) {
+        throw new Error(streamError);
       }
 
       toast.success("Crew synthesis complete");
@@ -129,26 +147,21 @@ export function DesignOpsCrewRunner({
     }
   }, [prompt, objectives, selectedObjectiveIds, onMessages, onRunStatusChange]);
 
-  const crewUnavailable = health?.status === "unavailable";
-  const ollamaUnavailable = health?.ollama === "unavailable";
+  const providerUnavailable =
+    health?.status === "ok" &&
+    ["unavailable", "missing_api_key", "error"].includes(
+      health?.providerStatus || ""
+    );
+  const providerName = health?.provider === "openai" ? "OpenAI" : "model provider";
 
   return (
     <div className="space-y-4">
       {/* Health warnings */}
-      {crewUnavailable && (
+      {providerUnavailable && (
         <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2">
           <AlertTriangle className="size-4 text-amber-400 shrink-0" />
           <p className="text-xs text-amber-400">
-            Crew service unavailable. Start it with: <code className="bg-muted px-1 rounded">cd crew && source venv/bin/activate && uvicorn main:app --port 8000</code>
-          </p>
-        </div>
-      )}
-
-      {!crewUnavailable && ollamaUnavailable && (
-        <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2">
-          <AlertTriangle className="size-4 text-amber-400 shrink-0" />
-          <p className="text-xs text-amber-400">
-            Ollama not running. Start Ollama to use Design Ops.
+            {providerName} is not configured. Update your Crew env to use Design Ops.
           </p>
         </div>
       )}
@@ -173,18 +186,35 @@ export function DesignOpsCrewRunner({
             {objectives.map((obj) => (
               <label
                 key={obj.id}
-                className="flex items-center gap-2 text-sm cursor-pointer hover:text-foreground transition-colors"
+                className="flex items-start gap-3 rounded-lg border border-transparent px-2 py-2 text-sm cursor-pointer transition-colors hover:border-border hover:bg-muted/30"
               >
                 <input
                   type="checkbox"
                   checked={selectedObjectiveIds.has(obj.id)}
                   onChange={() => toggleObjective(obj.id)}
                   disabled={running}
-                  className="rounded"
+                  className="mt-1 rounded shrink-0"
                 />
-                <span className={selectedObjectiveIds.has(obj.id) ? "text-foreground" : "text-muted-foreground"}>
-                  {obj.title}: {obj.metric} → {obj.target}
-                </span>
+                <div className="min-w-0 space-y-1">
+                  <p
+                    className={
+                      selectedObjectiveIds.has(obj.id)
+                        ? "font-medium text-foreground"
+                        : "font-medium text-muted-foreground"
+                    }
+                  >
+                    {obj.title}
+                  </p>
+                  <p className="text-xs leading-relaxed text-muted-foreground break-words">
+                    {obj.metric}
+                  </p>
+                  {obj.target && (
+                    <p className="text-xs leading-relaxed text-muted-foreground break-words">
+                      <span className="font-medium text-foreground/80">Target:</span>{" "}
+                      {obj.target}
+                    </p>
+                  )}
+                </div>
               </label>
             ))}
           </div>
@@ -194,7 +224,7 @@ export function DesignOpsCrewRunner({
       {/* Run button */}
       <Button
         onClick={handleRun}
-        disabled={running || crewUnavailable || !prompt.trim()}
+        disabled={running || !prompt.trim()}
         className="w-full"
       >
         {running ? (

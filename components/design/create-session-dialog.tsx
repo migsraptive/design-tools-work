@@ -8,8 +8,10 @@ import { cn } from "@/lib/utils";
 import { useSessions } from "@/lib/design-store";
 import { useAdmin } from "@/hooks/use-admin";
 import { generateId } from "@/lib/design-utils";
-import type { MediaType } from "@/lib/design-types";
+import type { MediaType, SessionValidation } from "@/lib/design-types";
 import { OptionForm } from "@/components/design/option-form";
+import { SessionBriefInputs } from "@/components/design/session-brief-inputs";
+import { SessionValidationFields } from "@/components/design/session-validation-fields";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +64,9 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
   const [goal, setGoal] = useState("");
   const [audience, setAudience] = useState("");
   const [constraints, setConstraints] = useState("");
+  const [validation, setValidation] = useState<SessionValidation>({
+    state: "unverified",
+  });
 
   // Step 2 — Options
   const [options, setOptions] = useState<OptionDraft[]>([
@@ -80,6 +85,7 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
     setGoal("");
     setAudience("");
     setConstraints("");
+    setValidation({ state: "unverified" });
     setOptions([makeDefaultOption(), makeDefaultOption()]);
   }
 
@@ -121,7 +127,8 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
           goal: goal.trim() || undefined,
           audience: audience.trim() || undefined,
           constraints: constraints.trim() || undefined,
-        }
+        },
+        validation,
       );
       toast.success(`Created "${session.title}"`);
       reset();
@@ -205,7 +212,7 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
               <Label htmlFor="session-desc">Description</Label>
               <Textarea
                 id="session-desc"
-                placeholder="Brief context for voters..."
+                placeholder="Proposed solution or concept summary for voters..."
                 rows={2}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -257,50 +264,27 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
 
               {showBrief && (
                 <div className="space-y-3 mt-3 pl-5 border-l-2 border-border">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="brief-problem" className="text-xs">Problem</Label>
-                    <Textarea
-                      id="brief-problem"
-                      placeholder="What problem does this solve?"
-                      rows={2}
-                      value={problem}
-                      onChange={(e) => setProblem(e.target.value)}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="brief-goal" className="text-xs">Goal</Label>
-                    <Textarea
-                      id="brief-goal"
-                      placeholder="What's the desired outcome?"
-                      rows={2}
-                      value={goal}
-                      onChange={(e) => setGoal(e.target.value)}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="brief-audience" className="text-xs">Audience</Label>
-                    <Input
-                      id="brief-audience"
-                      placeholder="Who is this for?"
-                      value={audience}
-                      onChange={(e) => setAudience(e.target.value)}
-                      className="text-sm"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="brief-constraints" className="text-xs">Constraints</Label>
-                    <Input
-                      id="brief-constraints"
-                      placeholder="Any limitations?"
-                      value={constraints}
-                      onChange={(e) => setConstraints(e.target.value)}
-                      className="text-sm"
-                    />
-                  </div>
+                  <SessionBriefInputs
+                    goal={goal}
+                    problem={problem}
+                    audience={audience}
+                    constraints={constraints}
+                    onGoalChange={setGoal}
+                    onProblemChange={setProblem}
+                    onAudienceChange={setAudience}
+                    onConstraintsChange={setConstraints}
+                    useTextarea
+                  />
                 </div>
               )}
+            </div>
+
+            <div className="rounded-xl border bg-muted/30 p-4">
+              <SessionValidationFields
+                value={validation}
+                onChange={setValidation}
+                compact
+              />
             </div>
           </div>
         )}

@@ -16,30 +16,40 @@ app = FastAPI(title="Design Ops Crew API")
 
 @app.get("/health")
 async def health():
-    """Check service health and Ollama connectivity."""
-    ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-    ollama_status = "unknown"
+    """Check service health and configured model provider."""
+    provider = os.environ.get("CREW_MODEL_PROVIDER")
+    if provider not in {"openai", "ollama"}:
+        provider = "openai" if os.environ.get("OPENAI_API_KEY") else "ollama"
 
-    try:
-        import httpx
-        async with httpx.AsyncClient(timeout=5) as client:
-            resp = await client.get(f"{ollama_url}/api/tags")
-            if resp.status_code == 200:
-                models = resp.json().get("models", [])
-                model_names = [m.get("name", "") for m in models]
-                ollama_status = "ok"
-            else:
-                ollama_status = "error"
-                model_names = []
-    except Exception:
-        ollama_status = "unavailable"
-        model_names = []
+    if provider == "openai":
+        provider_status = "configured" if os.environ.get("OPENAI_API_KEY") else "missing_api_key"
+        configured_model = os.environ.get("OPENAI_CREW_MODEL", "gpt-5.1-codex-mini")
+        model_names = [configured_model]
+    else:
+        ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+        provider_status = "unknown"
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=5) as client:
+                resp = await client.get(f"{ollama_url}/api/tags")
+                if resp.status_code == 200:
+                    models = resp.json().get("models", [])
+                    model_names = [m.get("name", "") for m in models]
+                    provider_status = "ok"
+                else:
+                    provider_status = "error"
+                    model_names = []
+        except Exception:
+            provider_status = "unavailable"
+            model_names = []
+        configured_model = os.environ.get("OLLAMA_MODEL", "qwen3.5")
 
     return {
         "status": "ok",
-        "ollama": ollama_status,
+        "provider": provider,
+        "provider_status": provider_status,
         "models": model_names,
-        "configured_model": os.environ.get("OLLAMA_MODEL", "qwen3.5"),
+        "configured_model": configured_model,
     }
 
 
