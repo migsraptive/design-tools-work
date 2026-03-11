@@ -19,10 +19,10 @@ The Manager/Worker pattern (Oracle orchestrates, workers execute and communicate
 
 | Agent ID | Name | Role |
 |----------|------|------|
-| `design_ops_manager` | **ORACLE** | Chief Design Officer / Orchestrator |
+| `design_ops_manager` | **Atlas** | Design Lead / Orchestrator |
 | `system_health_guardian` | **SENTRY** | Design System Integrity Monitor |
 | `trend_scout` | **SIGNAL** | UX Trends & Competitive Intelligence |
-| `research_synthesizer` | **MERIDIAN** | User Research & Insight Analyst |
+| `research_synthesizer` | **Beacon** | Research Analyst |
 | `slack_communicator` | **VOICE** | Communication Design & Channel Distribution |
 
 ## Key Design Decisions

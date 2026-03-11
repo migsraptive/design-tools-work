@@ -5,18 +5,30 @@ import { Loader2, Play, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import type { Objective, AgentMessage, CrewHealthStatus } from "@/lib/design-ops-types";
+import type {
+  Objective,
+  AgentMessage,
+  CrewHealthStatus,
+} from "@/lib/design-ops-types";
 
 interface DesignOpsCrewRunnerProps {
   objectives: Objective[];
   onMessages: (messages: AgentMessage[]) => void;
   onRunStatusChange: (running: boolean) => void;
+  onRunComplete?: (payload: {
+    prompt: string;
+    objectives: Objective[];
+    messages: AgentMessage[];
+    provider?: string;
+    model?: string;
+  }) => void | Promise<void>;
 }
 
 export function DesignOpsCrewRunner({
   objectives,
   onMessages,
   onRunStatusChange,
+  onRunComplete,
 }: DesignOpsCrewRunnerProps) {
   const [prompt, setPrompt] = useState("");
   const [selectedObjectiveIds, setSelectedObjectiveIds] = useState<Set<string>>(
@@ -50,6 +62,103 @@ export function DesignOpsCrewRunner({
     });
   };
 
+  const consumeEventChunk = useCallback(
+    (
+      eventChunk: string,
+      context: {
+        promptText: string;
+        messages: AgentMessage[];
+        onEmit: (nextMessages: AgentMessage[]) => void;
+        setStreamError: (message: string) => void;
+      }
+    ) => {
+      let currentEvent = "";
+      const lines = eventChunk
+        .split(/\r?\n/)
+        .map((line) => line.trimEnd())
+        .filter(Boolean);
+
+      for (const line of lines) {
+        if (line.startsWith("event:")) {
+          currentEvent = line.slice(6).trim();
+          continue;
+        }
+
+        if (!line.startsWith("data:")) continue;
+
+        try {
+          const data = JSON.parse(line.slice(5).trim());
+          if (currentEvent === "run_start") {
+            const msg: AgentMessage = {
+              from: "system",
+              fromName: "SYSTEM",
+              to: "user",
+              subject: "Crew run started",
+              priority: "standard",
+              confidence: "n/a",
+              assumptions: "The request was accepted and the crew orchestration has started.",
+              body: `Run started for prompt: ${data.prompt || context.promptText}`,
+              nextStep: "Oracle is framing the brief.",
+              timestamp: data.started_at || new Date().toISOString(),
+            };
+            context.messages.push(msg);
+            context.onEmit([...context.messages]);
+            continue;
+          }
+
+          if (currentEvent === "agent_start") {
+            const agentName =
+              data.agent === "ORACLE"
+                ? "Atlas"
+                : data.agent === "MERIDIAN"
+                  ? "Beacon"
+                  : data.agent || "Agent";
+            const msg: AgentMessage = {
+              from: data.agent_id || "system",
+              fromName: agentName,
+              to: "user",
+              subject: `${agentName} is working`,
+              priority: "standard",
+              confidence: "n/a",
+              assumptions: "This is a progress signal, not a synthesis result.",
+              body: `${agentName} is currently ${data.status || "working"} on the request.`,
+              nextStep: "Wait for the next streamed update.",
+              timestamp: new Date().toISOString(),
+            };
+            context.messages.push(msg);
+            context.onEmit([...context.messages]);
+            continue;
+          }
+
+          if (currentEvent === "error") {
+            context.setStreamError(data.error || "Crew run failed");
+            continue;
+          }
+
+          if (currentEvent === "agent_message" && data.from && data.body) {
+            const msg: AgentMessage = {
+              from: data.from,
+              fromName: data.from_name || data.fromName || "",
+              to: data.to || "",
+              subject: data.subject || "",
+              priority: data.priority || "standard",
+              confidence: data.confidence || "medium",
+              assumptions: data.assumptions || "",
+              body: data.body || "",
+              nextStep: data.next_step || data.nextStep || "",
+              timestamp: data.timestamp || new Date().toISOString(),
+            };
+            context.messages.push(msg);
+            context.onEmit([...context.messages]);
+          }
+        } catch {
+          // Skip non-JSON lines
+        }
+      }
+    },
+    []
+  );
+
   const handleRun = useCallback(async () => {
     if (!prompt.trim()) {
       toast.error("Enter a focus prompt for Oracle");
@@ -80,7 +189,6 @@ export function DesignOpsCrewRunner({
       const decoder = new TextDecoder();
       const messages: AgentMessage[] = [];
       let buffer = "";
-      let currentEvent = "";
       let streamError: string | null = null;
 
       while (true) {
@@ -88,55 +196,43 @@ export function DesignOpsCrewRunner({
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const events = buffer.split("\n\n");
+        const events = buffer.split(/\r?\n\r?\n/);
         buffer = events.pop() || "";
 
         for (const eventChunk of events) {
-          const lines = eventChunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("event: ")) {
-              currentEvent = line.slice(7).trim();
-            }
-
-            if (!line.startsWith("data: ")) continue;
-
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (currentEvent === "error") {
-                streamError = data.error || "Crew run failed";
-                continue;
-              }
-
-              if (currentEvent === "agent_message" && data.from && data.body) {
-                const msg: AgentMessage = {
-                  from: data.from,
-                  fromName: data.from_name || data.fromName || "",
-                  to: data.to || "",
-                  subject: data.subject || "",
-                  priority: data.priority || "standard",
-                  confidence: data.confidence || "medium",
-                  assumptions: data.assumptions || "",
-                  body: data.body || "",
-                  nextStep: data.next_step || data.nextStep || "",
-                  timestamp: data.timestamp || new Date().toISOString(),
-                };
-                messages.push(msg);
-                onMessages([...messages]);
-              }
-            } catch {
-              // Skip non-JSON lines
-            }
-          }
-
-          currentEvent = "";
+          consumeEventChunk(eventChunk, {
+            promptText: prompt.trim(),
+            messages,
+            onEmit: onMessages,
+            setStreamError: (message) => {
+              streamError = message;
+            },
+          });
         }
+      }
+
+      if (buffer.trim()) {
+        consumeEventChunk(buffer, {
+          promptText: prompt.trim(),
+          messages,
+          onEmit: onMessages,
+          setStreamError: (message) => {
+            streamError = message;
+          },
+        });
       }
 
       if (streamError) {
         throw new Error(streamError);
       }
 
+      await onRunComplete?.({
+        prompt: prompt.trim(),
+        objectives: selected,
+        messages: [...messages],
+        provider: health?.provider,
+        model: health?.configuredModel,
+      });
       toast.success("Crew synthesis complete");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Crew run failed";
@@ -145,7 +241,17 @@ export function DesignOpsCrewRunner({
       setRunning(false);
       onRunStatusChange(false);
     }
-  }, [prompt, objectives, selectedObjectiveIds, onMessages, onRunStatusChange]);
+  }, [
+    consumeEventChunk,
+    prompt,
+    objectives,
+    selectedObjectiveIds,
+    onMessages,
+    onRunStatusChange,
+    onRunComplete,
+    health?.provider,
+    health?.configuredModel,
+  ]);
 
   const providerUnavailable =
     health?.status === "ok" &&

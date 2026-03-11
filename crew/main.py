@@ -16,39 +16,21 @@ app = FastAPI(title="Design Ops Crew API")
 
 @app.get("/health")
 async def health():
-    """Check service health and configured model provider."""
-    provider = os.environ.get("CREW_MODEL_PROVIDER")
-    if provider not in {"openai", "ollama"}:
-        provider = "openai" if os.environ.get("OPENAI_API_KEY") else "ollama"
+    """Check service health and configured provider."""
+    provider = os.environ.get("CREW_MODEL_PROVIDER", "openai")
 
-    if provider == "openai":
+    if provider == "anthropic":
+        provider_status = "configured" if os.environ.get("ANTHROPIC_API_KEY") else "missing_api_key"
+        configured_model = os.environ.get("ANTHROPIC_CREW_MODEL", "claude-sonnet-4-5-20250929")
+    else:
         provider_status = "configured" if os.environ.get("OPENAI_API_KEY") else "missing_api_key"
         configured_model = os.environ.get("OPENAI_CREW_MODEL", "gpt-5.1-codex-mini")
-        model_names = [configured_model]
-    else:
-        ollama_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-        provider_status = "unknown"
-        try:
-            import httpx
-            async with httpx.AsyncClient(timeout=5) as client:
-                resp = await client.get(f"{ollama_url}/api/tags")
-                if resp.status_code == 200:
-                    models = resp.json().get("models", [])
-                    model_names = [m.get("name", "") for m in models]
-                    provider_status = "ok"
-                else:
-                    provider_status = "error"
-                    model_names = []
-        except Exception:
-            provider_status = "unavailable"
-            model_names = []
-        configured_model = os.environ.get("OLLAMA_MODEL", "qwen3.5")
 
     return {
         "status": "ok",
         "provider": provider,
         "provider_status": provider_status,
-        "models": model_names,
+        "models": [configured_model],
         "configured_model": configured_model,
     }
 
@@ -85,6 +67,7 @@ async def run_crew(request: Request):
             "data": json.dumps({
                 "agent": "ORACLE",
                 "agent_id": "design_ops_manager",
+                "agent_name": "Atlas",
                 "status": "thinking",
             }),
         }
@@ -105,7 +88,7 @@ async def run_crew(request: Request):
                 "event": "agent_message",
                 "data": json.dumps({
                     "from": "design_ops_manager",
-                    "from_name": "ORACLE",
+                    "from_name": "Atlas",
                     "to": "research_synthesizer",
                     "subject": f"Research brief: {prompt[:80]}",
                     "priority": "standard",
@@ -122,7 +105,7 @@ async def run_crew(request: Request):
                 "event": "agent_message",
                 "data": json.dumps({
                     "from": "research_synthesizer",
-                    "from_name": "MERIDIAN",
+                    "from_name": "Beacon",
                     "to": "design_ops_manager",
                     "subject": f"Synthesis: {prompt[:60]}",
                     "priority": "standard",
@@ -139,7 +122,7 @@ async def run_crew(request: Request):
                 "event": "agent_message",
                 "data": json.dumps({
                     "from": "design_ops_manager",
-                    "from_name": "ORACLE",
+                    "from_name": "Atlas",
                     "to": "user",
                     "subject": "Synthesis complete — review recommendations",
                     "priority": "standard",

@@ -1,28 +1,28 @@
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "qwen2.5:7b";
+import Anthropic from "@anthropic-ai/sdk";
+
+const SYNTHESIS_PROVIDER = process.env.SYNTHESIS_PROVIDER || "openai";
 const OPENAI_API_BASE = process.env.OPENAI_API_BASE || "https://api.openai.com/v1";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_SYNTHESIS_MODEL =
   process.env.OPENAI_SYNTHESIS_MODEL || "gpt-5.1-chat-latest";
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const ANTHROPIC_SYNTHESIS_MODEL =
+  process.env.ANTHROPIC_SYNTHESIS_MODEL || "claude-sonnet-4-5-20250929";
 
-export function getSynthesisProvider(): "openai" | "ollama" {
-  const configured = process.env.SYNTHESIS_PROVIDER;
-  if (configured === "openai" || configured === "ollama") {
-    return configured;
-  }
-  return OPENAI_API_KEY ? "openai" : "ollama";
+function isAnthropicProvider() {
+  return SYNTHESIS_PROVIDER === "anthropic";
 }
 
 export function getSynthesisModelName(): string {
-  return getSynthesisProvider() === "openai"
-    ? OPENAI_SYNTHESIS_MODEL
-    : OLLAMA_MODEL;
+  return isAnthropicProvider()
+    ? ANTHROPIC_SYNTHESIS_MODEL
+    : OPENAI_SYNTHESIS_MODEL;
 }
 
 export async function generateSynthesisText(prompt: string): Promise<string> {
-  return getSynthesisProvider() === "openai"
-    ? generateWithOpenAI(prompt)
-    : generateWithOllama(prompt);
+  return isAnthropicProvider()
+    ? generateWithAnthropic(prompt)
+    : generateWithOpenAI(prompt);
 }
 
 async function generateWithOpenAI(prompt: string): Promise<string> {
@@ -63,31 +63,29 @@ async function generateWithOpenAI(prompt: string): Promise<string> {
   throw new Error("OpenAI returned an empty completion");
 }
 
-async function generateWithOllama(prompt: string): Promise<string> {
-  const res = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: OLLAMA_MODEL,
-      prompt,
-      stream: false,
-      options: {
-        temperature: 0.3,
-        num_predict: 4096,
-      },
-    }),
+async function generateWithAnthropic(prompt: string): Promise<string> {
+  if (!ANTHROPIC_API_KEY) {
+    throw new Error("Anthropic API key is missing. Set ANTHROPIC_API_KEY.");
+  }
+
+  const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+  const message = await client.messages.create({
+    model: ANTHROPIC_SYNTHESIS_MODEL,
+    max_tokens: 4096,
+    temperature: 0.3,
+    messages: [{ role: "user", content: prompt }],
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Ollama error (${res.status}): ${text}`);
+  const text = message.content
+    .map((block) => ("text" in block ? block.text : ""))
+    .join("")
+    .trim();
+
+  if (!text) {
+    throw new Error("Anthropic returned an empty completion");
   }
 
-  const data: { response?: string } = await res.json();
-  if (!data.response) {
-    throw new Error("Ollama returned an empty response");
-  }
-  return data.response;
+  return text;
 }
 
 export function parseLLMJSON<T>(response: string): T {

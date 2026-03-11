@@ -12,12 +12,9 @@ Carrier expects these variables locally:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `DESIGN_TOOLS_PASSWORD`
-- `SYNTHESIS_PROVIDER`
 - `OPENAI_API_KEY`
 - `OPENAI_API_BASE`
 - `OPENAI_SYNTHESIS_MODEL`
-- `OLLAMA_BASE_URL`
-- `OLLAMA_MODEL`
 
 Where they are used:
 
@@ -47,23 +44,16 @@ Carrier's synthesis endpoints now call the shared provider layer in [synthesis-l
 
 Recommended OpenAI configuration:
 
-- `SYNTHESIS_PROVIDER=openai`
 - `OPENAI_API_KEY=...`
 - `OPENAI_API_BASE=https://api.openai.com/v1`
 - `OPENAI_SYNTHESIS_MODEL=gpt-5.1-chat-latest`
 
 Crew service recommendation in `crew/.env`:
 
-- `CREW_MODEL_PROVIDER=openai`
 - `OPENAI_API_KEY=...`
 - `OPENAI_CREW_MODEL=gpt-5.1-codex-mini`
 
-Ollama remains available as a fallback:
-
-- `OLLAMA_BASE_URL=http://localhost:11434`
-- `OLLAMA_MODEL=qwen2.5:7b`
-
-If you switch back to Ollama later, set the provider vars to `ollama` and keep the Ollama values above configured.
+Carrier and Design Ops are intentionally OpenAI-only so synthesis and Crew runs stay on one provider path.
 
 ## Schema Source of Truth
 
