@@ -27,6 +27,20 @@ def plain_text(value: str) -> str:
     return result.strip()
 
 
+def extract_section(value: str, label: str) -> str:
+    pattern = re.compile(
+        rf"^{re.escape(label)}:\s*(.*?)(?=^\s*[A-Z][A-Z\s]+:\s|\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    match = pattern.search(value)
+    return plain_text(match.group(1)) if match else ""
+
+
+def extract_confidence(value: str) -> str:
+    match = re.search(r"^CONFIDENCE:\s*(high|medium|low|n/a)", value, re.MULTILINE | re.IGNORECASE)
+    return match.group(1).lower() if match else "medium"
+
+
 @app.get("/health")
 async def health():
     """Check service health and configured provider."""
@@ -53,6 +67,7 @@ async def run_crew(request: Request):
     """Run the Design Ops crew and stream results via SSE."""
     body = await request.json()
     prompt = body.get("prompt", "")
+    mode = body.get("mode", "quick_read")
     objectives = body.get("objectives", [])
 
     if not prompt:
@@ -71,6 +86,7 @@ async def run_crew(request: Request):
                 "run_id": run_id,
                 "started_at": datetime.now().isoformat(),
                 "prompt": prompt,
+                "mode": mode,
             }),
         }
 
@@ -90,7 +106,24 @@ async def run_crew(request: Request):
             from crew import run_crew as _run_crew
 
             loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(None, _run_crew, prompt, objectives)
+            result = await loop.run_in_executor(None, _run_crew, prompt, objectives, mode)
+            result_text = plain_text(result)
+            beacon_subject = extract_section(result, "SUBJECT") or f"Synthesis: {prompt[:60]}"
+            beacon_confidence = extract_confidence(result)
+            beacon_assumptions = (
+                extract_section(result, "ASSUMPTIONS")
+                or "Analysis based on available observations and session data."
+            )
+            beacon_next_step = (
+                extract_section(result, "NEXT STEPS")
+                or extract_section(result, "NEXT STEP")
+                or "Review findings and consider prototyping recommendations."
+            )
+            beacon_readiness = extract_section(result, "READINESS")
+            beacon_additional_signals = (
+                extract_section(result, "ADDITIONAL SIGNALS WORTH GATHERING")
+                or extract_section(result, "WHAT WOULD IMPROVE CONFIDENCE")
+            )
 
             # Parse the result into agent messages
             # CrewAI returns the final output as a string
@@ -106,8 +139,13 @@ async def run_crew(request: Request):
                     "subject": f"Research brief: {prompt[:80]}",
                     "priority": "standard",
                     "confidence": "n/a",
-                    "assumptions": "Based on available evidence in the database. Scoped to last 30 days.",
-                    "body": f"Directing Meridian to analyze: {prompt}",
+                    "assumptions": "Based on available evidence in the workspace and the objectives selected for this run.",
+                    "body": (
+                        f"Directing Beacon to analyze: {prompt}\n\n"
+                        f"MODE: {mode.replace('_', ' ')}\n\n"
+                        f"READINESS: Atlas has framed the brief and scoped the evidence request.\n\n"
+                        f"WHAT WOULD IMPROVE CONFIDENCE: If the evidence is thin, Beacon should surface the next 1-3 signals worth gathering."
+                    ),
                     "next_step": "Meridian to pull evidence and synthesize",
                     "timestamp": datetime.now().isoformat(),
                 }),
@@ -120,12 +158,12 @@ async def run_crew(request: Request):
                     "from": "research_synthesizer",
                     "from_name": "Beacon",
                     "to": "design_ops_manager",
-                    "subject": f"Synthesis: {prompt[:60]}",
+                    "subject": beacon_subject,
                     "priority": "standard",
-                    "confidence": "medium",
-                    "assumptions": "Analysis based on available observations and session data.",
-                    "body": plain_text(result),
-                    "next_step": "Review findings and consider prototyping recommendations.",
+                    "confidence": beacon_confidence,
+                    "assumptions": beacon_assumptions,
+                    "body": result_text,
+                    "next_step": beacon_next_step,
                     "timestamp": datetime.now().isoformat(),
                 }),
             }
@@ -139,15 +177,17 @@ async def run_crew(request: Request):
                     "to": "user",
                     "subject": "Synthesis complete — review recommendations",
                     "priority": "standard",
-                    "confidence": "medium",
-                    "assumptions": "Recommendations are directional. Validate with additional research before committing.",
-                    "body": (
-                        "Meridian has completed the synthesis. Review the findings above and note "
-                        "the confidence levels on each pattern. Recommendations with High confidence "
-                        "can be acted on. Medium and Low confidence findings should be validated with "
-                        "additional evidence before committing resources."
+                    "confidence": beacon_confidence,
+                    "assumptions": (
+                        "Recommendations are directional and should be weighed against the available evidence "
+                        "and any assumptions surfaced in the synthesis."
                     ),
-                    "next_step": "Prioritize high-confidence recommendations for prototyping.",
+                    "body": (
+                        "Beacon has completed the synthesis.\n\n"
+                        f"READINESS: {beacon_readiness or 'Use the confidence and assumptions sections to judge whether the evidence is strong enough to act on now.'}\n\n"
+                        f"WHAT WOULD IMPROVE CONFIDENCE: {beacon_additional_signals or 'Use the additional signals section in the synthesis to identify the next best evidence to gather.'}"
+                    ),
+                    "next_step": beacon_next_step,
                     "timestamp": datetime.now().isoformat(),
                 }),
             }

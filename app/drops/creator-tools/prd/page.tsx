@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { FileText } from "lucide-react";
 import { BriefFramingSequence } from "@/components/design/brief-framing-sequence";
 import { CreatorToolsDocCard } from "@/components/design/creator-tools-doc-card";
@@ -250,12 +251,21 @@ const researchSections = [
   },
 ];
 
-function SectionCard({ title, body }: { title: string; body: string }) {
+function SectionCard({
+  title,
+  body,
+  children,
+}: {
+  title: string;
+  body: string;
+  children?: ReactNode;
+}) {
   return (
     <CreatorToolsDocCard title={title}>
       <p className="mt-2 text-sm leading-7 text-muted-foreground">
         {body}
       </p>
+      {children ? <div className="mt-5">{children}</div> : null}
     </CreatorToolsDocCard>
   );
 }
@@ -334,15 +344,27 @@ export default function CreatorToolsPrdPage() {
           <SectionCard
             title="User Stories & Problem Statement"
             body="Creators are the engine of the community. When they're inactive, reader engagement drops, return visits decline, and pageview revenue suffers. The current platform gives creators no visibility into what's working and no way to manage their presence efficiently."
-          />
-
-          <CreatorToolsDocCard>
+          >
             <div className="space-y-3 text-sm leading-7 text-foreground/90">
               {userStories.map((story) => (
                 <p key={story.title}>{story.title}</p>
               ))}
             </div>
-          </CreatorToolsDocCard>
+          </SectionCard>
+
+          <SectionCard
+            title="Goals, Metrics & Definition of Success"
+            body="Success means creators are posting more, engaging more meaningfully, and driving measurable pageview lift — measured 90 days post-launch."
+          >
+            <DataTable
+              headers={["Metric", "Target", "Business KPI"]}
+              rows={successMetrics.map((item) => [
+                item.metric,
+                item.target,
+                item.businessKpi,
+              ])}
+            />
+          </SectionCard>
 
           <CreatorToolsDocCard title="External Forces">
             <div className="space-y-4">
@@ -383,21 +405,6 @@ export default function CreatorToolsPrdPage() {
               </div>
             </div>
           </CreatorToolsDocCard>
-
-          <section className="space-y-4">
-            <SectionCard
-              title="Goals, Metrics & Definition of Success"
-              body="Success means creators are posting more, engaging more meaningfully, and driving measurable pageview lift — measured 90 days post-launch."
-            />
-            <DataTable
-              headers={["Metric", "Target", "Business KPI"]}
-              rows={successMetrics.map((item) => [
-                item.metric,
-                item.target,
-                item.businessKpi,
-              ])}
-            />
-          </section>
 
           <section className="space-y-4">
             <SectionCard

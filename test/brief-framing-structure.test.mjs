@@ -44,10 +44,17 @@ test("session creation surfaces mention the same framing order", () => {
   const page = read("app/new/page.tsx");
   const dialog = read("components/design/create-session-dialog.tsx");
   const inputs = read("components/design/session-brief-inputs.tsx");
+  const liveDraftFields = read("components/design/live-draft-header-fields.tsx");
 
   assert.match(page, /SessionBriefInputs/);
   assert.match(dialog, /SessionBriefInputs/);
+  assert.match(page, /LiveDraftHeaderFields/);
+  assert.match(dialog, /LiveDraftHeaderFields/);
   assert.match(inputs, /BriefFramingSequence/);
+  assert.match(page, /Session title\.\.\./i);
   assert.match(page, /Proposed solution or concept summary for voters/i);
+  assert.match(dialog, /Homepage hero redesign/i);
   assert.match(dialog, /Proposed solution or concept summary for voters/i);
+  assert.match(liveDraftFields, /titlePlaceholder/);
+  assert.match(liveDraftFields, /descriptionPlaceholder/);
 });

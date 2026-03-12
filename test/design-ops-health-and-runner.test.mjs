@@ -24,14 +24,25 @@ test("design ops health route mirrors provider-based crew health", () => {
   assert.match(types, /providerStatus\?: string;/);
 });
 
-test("design ops runner renders selectable objectives as wrapped stacked content", () => {
+test("design ops runner renders a single active objective with mode-based synthesis", () => {
   const runner = read("components/design/design-ops-crew-runner.tsx");
+  const activeObjectiveSummary = read(
+    "components/design/design-ops-active-objective-summary.tsx"
+  );
+  const crewMain = read("crew/main.py");
+  const crewLogic = read("crew/crew.py");
+  const formatting = read("lib/design-ops-formatting.ts");
 
   assert.match(runner, /providerName = health\?\.provider === "openai" \? "OpenAI" : "model provider"/);
-  assert.match(runner, /className="flex items-start gap-3 rounded-lg/);
-  assert.match(runner, /className="mt-1 rounded shrink-0"/);
-  assert.match(runner, /<div className="min-w-0 space-y-1">/);
-  assert.match(runner, /Target:<\/span>/);
+  assert.match(runner, /const \[mode, setMode\] = useState<SynthesisMode>\("quick_read"\)/);
+  assert.match(runner, /SYNTHESIS_MODES/);
+  assert.match(runner, /Synthesis depth/);
+  assert.match(runner, /Run \{\s*SYNTHESIS_MODES\.find/);
+  assert.match(runner, /mode,/);
+  assert.match(runner, /DesignOpsActiveObjectiveSummary/);
+  assert.match(activeObjectiveSummary, /Active objective/);
+  assert.match(runner, /Create or load an objective first/);
+  assert.match(runner, /objectives: \[objective\]/);
   assert.match(runner, /currentEvent === "run_start"/);
   assert.match(runner, /subject: "Crew run started"/);
   assert.match(runner, /currentEvent === "agent_start"/);
@@ -43,9 +54,37 @@ test("design ops runner renders selectable objectives as wrapped stacked content
   assert.match(runner, /consumeEventChunk/);
   assert.match(runner, /if \(currentEvent === "error"\)/);
   assert.match(runner, /throw new Error\(streamError\);/);
-  assert.match(runner, /disabled=\{running \|\| !prompt\.trim\(\)\}/);
+  assert.match(runner, /disabled=\{running \|\| !prompt\.trim\(\) \|\| !objective\}/);
   assert.doesNotMatch(runner, /crewUnavailable/);
   assert.doesNotMatch(runner, /Ollama not running/);
   assert.doesNotMatch(runner, /Ollama/);
-  assert.doesNotMatch(runner, /\{obj\.title\}: \{obj\.metric\} → \{obj\.target\}/);
+  assert.doesNotMatch(runner, /Evaluate against/);
+  assert.match(crewMain, /extract_section/);
+  assert.match(crewMain, /extract_confidence/);
+  assert.match(crewMain, /mode = body\.get\("mode", "quick_read"\)/);
+  assert.match(crewMain, /"mode": mode/);
+  assert.match(crewMain, /ADDITIONAL SIGNALS WORTH GATHERING/);
+  assert.match(crewMain, /WHAT WOULD IMPROVE CONFIDENCE/);
+  assert.match(crewMain, /beacon_readiness/);
+  assert.match(crewMain, /beacon_next_step/);
+  assert.match(crewLogic, /def get_mode_guidance/);
+  assert.match(crewLogic, /SYNTHESIS MODE: Quick read/);
+  assert.match(crewLogic, /SYNTHESIS MODE: Decision memo/);
+  assert.match(crewLogic, /SYNTHESIS MODE: Deep dive/);
+  assert.match(formatting, /READINESS/);
+  assert.match(formatting, /ADDITIONAL SIGNALS WORTH GATHERING/);
+  assert.match(formatting, /WHAT WOULD IMPROVE CONFIDENCE/);
+  assert.match(formatting, /Assumptions/);
+  assert.match(formatting, /Additional signals/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /SEGMENT:/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /LIFECYCLE COHORT:/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /STAGE:/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /METRIC TO MOVE:/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /READINESS:/);
+  assert.match(read("crew\/tasks\/frame_brief.py"), /WHAT WOULD IMPROVE CONFIDENCE:/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /Segment relevance/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /Lifecycle cohort relevance/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /GROWTH STAGE:/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /ADDITIONAL SIGNALS WORTH GATHERING:/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /READINESS:/);
 });

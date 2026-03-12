@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { getCreatorToolsPillClass } from "@/lib/creator-tools-pill";
+import { creatorToolsInteractiveSurfaceClass } from "@/lib/creator-tools-surfaces";
 import { cn } from "@/lib/utils";
 
 export function CreatorToolsLinkCard({
@@ -24,7 +25,8 @@ export function CreatorToolsLinkCard({
     <Link
       href={href}
       className={cn(
-        "group block rounded-2xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/35 hover:border-primary/30",
+        "group block",
+        creatorToolsInteractiveSurfaceClass,
         className
       )}
     >

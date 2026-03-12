@@ -4,20 +4,23 @@ import { useState, useEffect, useCallback } from "react";
 import { Loader2, Play, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { DesignOpsActiveObjectiveSummary } from "@/components/design/design-ops-active-objective-summary";
 import { toPlainText } from "@/lib/design-ops-formatting";
 import { toast } from "sonner";
 import type {
   Objective,
   AgentMessage,
   CrewHealthStatus,
+  SynthesisMode,
 } from "@/lib/design-ops-types";
 
 interface DesignOpsCrewRunnerProps {
-  objectives: Objective[];
+  objective: Objective | null;
   onMessages: (messages: AgentMessage[]) => void;
   onRunStatusChange: (running: boolean) => void;
   onRunComplete?: (payload: {
     prompt: string;
+    mode: SynthesisMode;
     objectives: Objective[];
     messages: AgentMessage[];
     provider?: string;
@@ -25,16 +28,36 @@ interface DesignOpsCrewRunnerProps {
   }) => void | Promise<void>;
 }
 
+const SYNTHESIS_MODES: Array<{
+  value: SynthesisMode;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "quick_read",
+    label: "Quick read",
+    description: "Fast signal: recommendation, confidence, assumptions, next step.",
+  },
+  {
+    value: "decision_memo",
+    label: "Decision memo",
+    description: "Balanced depth: recommendation, rationale, alternatives, and risks.",
+  },
+  {
+    value: "deep_dive",
+    label: "Deep dive",
+    description: "Full analysis: scenarios, evidence gaps, and richer tradeoffs.",
+  },
+];
+
 export function DesignOpsCrewRunner({
-  objectives,
+  objective,
   onMessages,
   onRunStatusChange,
   onRunComplete,
 }: DesignOpsCrewRunnerProps) {
   const [prompt, setPrompt] = useState("");
-  const [selectedObjectiveIds, setSelectedObjectiveIds] = useState<Set<string>>(
-    new Set(objectives.map((o) => o.id))
-  );
+  const [mode, setMode] = useState<SynthesisMode>("quick_read");
   const [running, setRunning] = useState(false);
   const [health, setHealth] = useState<CrewHealthStatus | null>(null);
 
@@ -45,23 +68,6 @@ export function DesignOpsCrewRunner({
       .then(setHealth)
       .catch(() => setHealth(null));
   }, []);
-
-  // Sync selected objectives when new ones are added
-  useEffect(() => {
-    setSelectedObjectiveIds(new Set(objectives.map((o) => o.id)));
-  }, [objectives]);
-
-  const toggleObjective = (id: string) => {
-    setSelectedObjectiveIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
 
   const consumeEventChunk = useCallback(
     (
@@ -165,8 +171,10 @@ export function DesignOpsCrewRunner({
       toast.error("Enter a focus prompt for Oracle");
       return;
     }
-
-    const selected = objectives.filter((o) => selectedObjectiveIds.has(o.id));
+    if (!objective) {
+      toast.error("Create or load an objective first");
+      return;
+    }
 
     setRunning(true);
     onRunStatusChange(true);
@@ -176,7 +184,11 @@ export function DesignOpsCrewRunner({
       const res = await fetch("/api/design-ops/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), objectives: selected }),
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          mode,
+          objectives: [objective],
+        }),
       });
 
       if (!res.ok) {
@@ -229,7 +241,8 @@ export function DesignOpsCrewRunner({
 
       await onRunComplete?.({
         prompt: prompt.trim(),
-        objectives: selected,
+        mode,
+        objectives: [objective],
         messages: [...messages],
         provider: health?.provider,
         model: health?.configuredModel,
@@ -245,8 +258,8 @@ export function DesignOpsCrewRunner({
   }, [
     consumeEventChunk,
     prompt,
-    objectives,
-    selectedObjectiveIds,
+    mode,
+    objective,
     onMessages,
     onRunStatusChange,
     onRunComplete,
@@ -275,6 +288,33 @@ export function DesignOpsCrewRunner({
 
       {/* Prompt input */}
       <div>
+        <label className="mb-1.5 block text-sm font-medium">Synthesis depth</label>
+        <div className="grid gap-2 md:grid-cols-3">
+          {SYNTHESIS_MODES.map((option) => {
+            const selected = mode === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setMode(option.value)}
+                disabled={running}
+                className={`rounded-xl border px-3 py-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary/40 bg-primary/8"
+                    : "border-border/60 bg-background hover:bg-secondary/30"
+                }`}
+              >
+                <p className="text-sm font-semibold">{option.label}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  {option.description}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
         <label className="text-sm font-medium mb-1.5 block">Focus prompt</label>
         <Textarea
           placeholder="What should Oracle focus on? (e.g., Why are users dropping off during onboarding?)"
@@ -285,64 +325,25 @@ export function DesignOpsCrewRunner({
         />
       </div>
 
-      {/* Objective selection */}
-      {objectives.length > 0 && (
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">Evaluate against</label>
-          <div className="space-y-1.5">
-            {objectives.map((obj) => (
-              <label
-                key={obj.id}
-                className="flex items-start gap-3 rounded-lg border border-transparent px-2 py-2 text-sm cursor-pointer transition-colors hover:border-border hover:bg-muted/30"
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedObjectiveIds.has(obj.id)}
-                  onChange={() => toggleObjective(obj.id)}
-                  disabled={running}
-                  className="mt-1 rounded shrink-0"
-                />
-                <div className="min-w-0 space-y-1">
-                  <p
-                    className={
-                      selectedObjectiveIds.has(obj.id)
-                        ? "font-medium text-foreground"
-                        : "font-medium text-muted-foreground"
-                    }
-                  >
-                    {obj.title}
-                  </p>
-                  <p className="text-xs leading-relaxed text-muted-foreground break-words">
-                    {obj.metric}
-                  </p>
-                  {obj.target && (
-                    <p className="text-xs leading-relaxed text-muted-foreground break-words">
-                      <span className="font-medium text-foreground/80">Target:</span>{" "}
-                      {obj.target}
-                    </p>
-                  )}
-                </div>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
+      {objective ? (
+        <DesignOpsActiveObjectiveSummary objective={objective} />
+      ) : null}
 
       {/* Run button */}
       <Button
         onClick={handleRun}
-        disabled={running || !prompt.trim()}
+        disabled={running || !prompt.trim() || !objective}
         className="w-full"
       >
         {running ? (
           <>
             <Loader2 className="size-4 animate-spin mr-2" />
-            Crew is thinking...
+            {SYNTHESIS_MODES.find((option) => option.value === mode)?.label} in progress...
           </>
         ) : (
           <>
             <Play className="size-4 mr-2" />
-            Run Crew
+            Run {SYNTHESIS_MODES.find((option) => option.value === mode)?.label}
           </>
         )}
       </Button>

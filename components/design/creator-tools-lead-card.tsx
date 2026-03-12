@@ -1,4 +1,8 @@
 import type { ReactNode } from "react";
+import {
+  creatorToolsLeadSurfaceClass,
+  creatorToolsMutedSurfaceClass,
+} from "@/lib/creator-tools-surfaces";
 import { cn } from "@/lib/utils";
 
 export function CreatorToolsLeadCard({
@@ -19,7 +23,7 @@ export function CreatorToolsLeadCard({
   return (
     <div
       className={cn(
-        "rounded-[28px] border border-border/60 bg-primary/95 p-5 text-primary-foreground",
+        creatorToolsLeadSurfaceClass,
         className
       )}
     >
@@ -31,7 +35,12 @@ export function CreatorToolsLeadCard({
       </h3>
       <p className="mt-3 text-sm leading-6 text-primary-foreground/82">{description}</p>
       {details ? (
-        <div className="mt-4 rounded-2xl border border-primary-foreground/15 bg-black/10 p-4">
+        <div
+          className={cn(
+            "mt-4 border-primary-foreground/15 bg-black/10 text-primary-foreground",
+            creatorToolsMutedSurfaceClass
+          )}
+        >
           {details}
         </div>
       ) : null}

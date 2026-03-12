@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import type { Objective } from "@/lib/design-ops-types";
 
 const FILE_PATH = path.join(process.cwd(), "data", "objectives.json");
 const FILE_DIR = path.dirname(FILE_PATH);
@@ -8,7 +9,22 @@ const FILE_DIR = path.dirname(FILE_PATH);
 async function readObjectives() {
   try {
     const data = await fs.readFile(FILE_PATH, "utf-8");
-    return JSON.parse(data);
+    return JSON.parse(data).map((objective: Partial<Objective>) => ({
+      id: objective.id,
+      title: objective.title ?? "",
+      metric: objective.metric ?? "",
+      target: objective.target ?? "",
+      description: objective.description ?? "",
+      type: objective.type ?? "product",
+      stage: objective.stage ?? "q2_learn",
+      segmentIds: Array.isArray(objective.segmentIds) ? objective.segmentIds : [],
+      lifecycleCohorts: Array.isArray(objective.lifecycleCohorts)
+        ? objective.lifecycleCohorts
+        : [],
+      theoryOfSuccess: objective.theoryOfSuccess ?? "",
+      owner: objective.owner ?? "",
+      createdAt: objective.createdAt ?? new Date().toISOString(),
+    }));
   } catch {
     return [];
   }
@@ -26,7 +42,18 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { title, metric, target, description } = body;
+  const {
+    title,
+    metric,
+    target,
+    description,
+    type,
+    stage,
+    segmentIds,
+    lifecycleCohorts,
+    theoryOfSuccess,
+    owner,
+  } = body;
 
   if (!title || !metric) {
     return NextResponse.json(
@@ -42,6 +69,12 @@ export async function POST(request: Request) {
     metric,
     target: target || "",
     description: description || "",
+    type: type || "product",
+    stage: stage || "q2_learn",
+    segmentIds: Array.isArray(segmentIds) ? segmentIds : [],
+    lifecycleCohorts: Array.isArray(lifecycleCohorts) ? lifecycleCohorts : [],
+    theoryOfSuccess: theoryOfSuccess || "",
+    owner: owner || "",
     createdAt: new Date().toISOString(),
   };
 
@@ -70,4 +103,43 @@ export async function DELETE(request: Request) {
 
   await writeObjectives(filtered);
   return NextResponse.json({ ok: true });
+}
+
+export async function PATCH(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "id is required" }, { status: 400 });
+  }
+
+  const body = await request.json();
+  const objectives = await readObjectives();
+  const index = objectives.findIndex((objective: Objective) => objective.id === id);
+
+  if (index === -1) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
+  const current = objectives[index] as Objective;
+  const updated: Objective = {
+    ...current,
+    title: body.title ?? current.title,
+    metric: body.metric ?? current.metric,
+    target: body.target ?? current.target,
+    description: body.description ?? current.description,
+    type: body.type ?? current.type,
+    stage: body.stage ?? current.stage,
+    segmentIds: Array.isArray(body.segmentIds) ? body.segmentIds : current.segmentIds,
+    lifecycleCohorts: Array.isArray(body.lifecycleCohorts)
+      ? body.lifecycleCohorts
+      : current.lifecycleCohorts,
+    theoryOfSuccess: body.theoryOfSuccess ?? current.theoryOfSuccess ?? "",
+    owner: body.owner ?? current.owner ?? "",
+  };
+
+  objectives[index] = updated;
+  await writeObjectives(objectives);
+
+  return NextResponse.json(updated);
 }
