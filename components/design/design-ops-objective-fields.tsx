@@ -163,72 +163,68 @@ export function DesignOpsObjectiveFields({
           className={isInline ? inlineBodyClassName : undefined}
         />
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor={`${idBase}-metric`} className="text-sm font-semibold">
-            Primary metric
-          </Label>
-          <Select value={String(value.metric)} onValueChange={(next) => update("metric", next)}>
-            <SelectTrigger id={`${idBase}-metric`} className="w-full" aria-label="Primary metric">
-              <SelectValue placeholder="Primary metric" />
-            </SelectTrigger>
-            <SelectContent>
-              {growthMetricOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor={`${idBase}-stage`} className="text-sm font-semibold">
-            When this matters
-          </Label>
-          <Select value={value.stage} onValueChange={(next) => update("stage", next)}>
-            <SelectTrigger id={`${idBase}-stage`} className="w-full" aria-label="When this matters">
-              <SelectValue placeholder="When this matters" />
-            </SelectTrigger>
-            <SelectContent>
-              {growthStageOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-1">
+        <Label htmlFor={`${idBase}-metric`} className="text-sm font-semibold">
+          Primary metric
+        </Label>
+        <Select value={String(value.metric)} onValueChange={(next) => update("metric", next)}>
+          <SelectTrigger id={`${idBase}-metric`} className="w-full" aria-label="Primary metric">
+            <SelectValue placeholder="Primary metric" />
+          </SelectTrigger>
+          <SelectContent>
+            {growthMetricOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <DesignOpsMultiSelect
-          id={`${idBase}-segments`}
-          label="Segments"
-          description="Which creator or community segments should this objective apply to?"
-          placeholder="Choose one or more segments"
-          placeholderClassName="text-lg"
-          options={designOpsSegments.map((segment) => ({
-            value: segment.id,
-            label: segment.name,
-            description: segment.description,
-          }))}
-          selectedValues={value.segmentIds}
-          onToggle={toggleSegment}
-        />
-        <DesignOpsMultiSelect
-          id={`${idBase}-cohorts`}
-          label="Lifecycle cohorts"
-          description="Which in-product user behaviors matter most for this objective?"
-          placeholder="Choose one or more cohorts"
-          placeholderClassName="text-lg"
-          options={lifecycleCohortOptions.map((cohort) => ({
-            value: cohort.value,
-            label: cohort.label,
-            description: cohort.description,
-          }))}
-          selectedValues={value.lifecycleCohorts}
-          onToggle={toggleLifecycleCohort}
-        />
+      <div className="space-y-1">
+        <Label htmlFor={`${idBase}-stage`} className="text-sm font-semibold">
+          When this matters
+        </Label>
+        <Select value={value.stage} onValueChange={(next) => update("stage", next)}>
+          <SelectTrigger id={`${idBase}-stage`} className="w-full" aria-label="When this matters">
+            <SelectValue placeholder="When this matters" />
+          </SelectTrigger>
+          <SelectContent>
+            {growthStageOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
+      <DesignOpsMultiSelect
+        id={`${idBase}-segments`}
+        label="Segments"
+        description="Which creator or community segments should this objective apply to?"
+        placeholder="Choose one or more segments"
+        placeholderClassName="text-lg"
+        options={designOpsSegments.map((segment) => ({
+          value: segment.id,
+          label: segment.name,
+          description: segment.description,
+        }))}
+        selectedValues={value.segmentIds}
+        onToggle={toggleSegment}
+      />
+      <DesignOpsMultiSelect
+        id={`${idBase}-cohorts`}
+        label="Lifecycle cohorts"
+        description="Which in-product user behaviors matter most for this objective?"
+        placeholder="Choose one or more cohorts"
+        placeholderClassName="text-lg"
+        options={lifecycleCohortOptions.map((cohort) => ({
+          value: cohort.value,
+          label: cohort.label,
+          description: cohort.description,
+        }))}
+        selectedValues={value.lifecycleCohorts}
+        onToggle={toggleLifecycleCohort}
+      />
 
       <Button
         type="button"
@@ -242,35 +238,33 @@ export function DesignOpsObjectiveFields({
 
       {showAdvanced && (
         <div className="space-y-3 rounded-xl border border-border/60 bg-secondary/20 p-4">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div className="space-y-1">
-              <Label htmlFor={`${idBase}-type`} className="text-sm font-semibold">
-                Objective type
-              </Label>
-              <Select value={value.type} onValueChange={(next) => update("type", next)}>
-                <SelectTrigger id={`${idBase}-type`} className="w-full" aria-label="Objective type">
-                  <SelectValue placeholder="Objective type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {objectiveTypeOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor={`${idBase}-owner`} className="text-sm font-semibold">
-                Owner
-              </Label>
-              <Input
-                id={`${idBase}-owner`}
-                placeholder="Owner (e.g., Product, Miguel, Growth)"
-                value={value.owner ?? ""}
-                onChange={(e) => update("owner", e.target.value)}
-              />
-            </div>
+          <div className="space-y-1">
+            <Label htmlFor={`${idBase}-type`} className="text-sm font-semibold">
+              Objective type
+            </Label>
+            <Select value={value.type} onValueChange={(next) => update("type", next)}>
+              <SelectTrigger id={`${idBase}-type`} className="w-full" aria-label="Objective type">
+                <SelectValue placeholder="Objective type" />
+              </SelectTrigger>
+              <SelectContent>
+                {objectiveTypeOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`${idBase}-owner`} className="text-sm font-semibold">
+              Owner
+            </Label>
+            <Input
+              id={`${idBase}-owner`}
+              placeholder="Owner (e.g., Product, Miguel, Growth)"
+              value={value.owner ?? ""}
+              onChange={(e) => update("owner", e.target.value)}
+            />
           </div>
         </div>
       )}

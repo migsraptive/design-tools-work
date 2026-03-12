@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Loader2, Play, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DesignOpsActiveObjectiveSummary } from "@/components/design/design-ops-active-objective-summary";
 import { toPlainText } from "@/lib/design-ops-formatting";
+import {
+  buildDeepDiveReferencePrompt,
+  buildRecommendedPrompt,
+  getModePromptGuidance,
+} from "@/lib/design-ops-prompts";
 import { toast } from "sonner";
 import type {
   Objective,
@@ -18,6 +23,7 @@ interface DesignOpsCrewRunnerProps {
   objective: Objective | null;
   onMessages: (messages: AgentMessage[]) => void;
   onRunStatusChange: (running: boolean) => void;
+  onModeChange?: (mode: SynthesisMode) => void;
   onRunComplete?: (payload: {
     prompt: string;
     mode: SynthesisMode;
@@ -54,12 +60,31 @@ export function DesignOpsCrewRunner({
   objective,
   onMessages,
   onRunStatusChange,
+  onModeChange,
   onRunComplete,
 }: DesignOpsCrewRunnerProps) {
   const [prompt, setPrompt] = useState("");
-  const [mode, setMode] = useState<SynthesisMode>("quick_read");
+  const [mode, setMode] = useState<SynthesisMode>("decision_memo");
   const [running, setRunning] = useState(false);
   const [health, setHealth] = useState<CrewHealthStatus | null>(null);
+  const lastSuggestedPrompt = useRef("");
+  const recommendedPrompt = useMemo(() => buildRecommendedPrompt(objective), [objective]);
+  const deepDiveReferencePrompt = useMemo(
+    () => buildDeepDiveReferencePrompt(objective),
+    [objective]
+  );
+
+  useEffect(() => {
+    if (!recommendedPrompt) return;
+    if (!prompt.trim() || prompt === lastSuggestedPrompt.current) {
+      setPrompt(recommendedPrompt);
+      lastSuggestedPrompt.current = recommendedPrompt;
+    }
+  }, [recommendedPrompt, prompt]);
+
+  useEffect(() => {
+    onModeChange?.(mode);
+  }, [mode, onModeChange]);
 
   // Health check on mount
   useEffect(() => {
@@ -323,6 +348,39 @@ export function DesignOpsCrewRunner({
           rows={3}
           disabled={running}
         />
+        <div className="mt-3 space-y-3">
+          <p className="text-sm text-muted-foreground">{getModePromptGuidance(mode)}</p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={!recommendedPrompt || running}
+              onClick={() => {
+                setPrompt(recommendedPrompt);
+                lastSuggestedPrompt.current = recommendedPrompt;
+              }}
+            >
+              Use recommended prompt
+            </Button>
+          </div>
+          {deepDiveReferencePrompt ? (
+            <details className="rounded-xl border border-border/60 bg-muted/20 p-3">
+              <summary className="cursor-pointer text-sm font-medium text-foreground">
+                Deep dive reference prompt
+              </summary>
+              <div className="mt-3 space-y-3">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Keep the larger prompt here for slower, richer runs. Use it as reference when
+                  you need more rigor, not as the default.
+                </p>
+                <p className="rounded-lg border border-border/60 bg-background px-3 py-3 text-sm leading-6 text-foreground/85">
+                  {deepDiveReferencePrompt}
+                </p>
+              </div>
+            </details>
+          ) : null}
+        </div>
       </div>
 
       {objective ? (

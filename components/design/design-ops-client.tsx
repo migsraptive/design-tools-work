@@ -18,12 +18,14 @@ export function DesignOpsClient() {
     running,
     loading,
     activeStep,
+    currentRunMode,
     canOpenSynthesis,
     canOpenFindings,
     setActiveObjectiveId,
     setMessages,
     setRunning,
     setActiveStep,
+    setCurrentRunMode,
     addObjective,
     updateObjective,
     deleteObjective,
@@ -84,6 +86,7 @@ export function DesignOpsClient() {
             objective={activeObjective}
             onMessages={setMessages}
             onRunStatusChange={setRunning}
+            onModeChange={setCurrentRunMode}
             onRunComplete={archiveRun}
           />
 
@@ -110,7 +113,7 @@ export function DesignOpsClient() {
               <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 {running ? "Live synthesis" : "Current findings"}
               </h3>
-              <DesignOpsTimeline messages={messages} />
+              <DesignOpsTimeline messages={messages} mode={currentRunMode} />
             </div>
           )}
 

@@ -90,16 +90,26 @@ async def run_crew(request: Request):
             }),
         }
 
-        # Send Oracle thinking event
-        yield {
-            "event": "agent_start",
-            "data": json.dumps({
-                "agent": "ORACLE",
-                "agent_id": "design_ops_manager",
-                "agent_name": "Atlas",
-                "status": "thinking",
-            }),
-        }
+        if mode == "quick_read":
+            yield {
+                "event": "agent_start",
+                "data": json.dumps({
+                    "agent": "MERIDIAN",
+                    "agent_id": "research_synthesizer",
+                    "agent_name": "Beacon",
+                    "status": "thinking",
+                }),
+            }
+        else:
+            yield {
+                "event": "agent_start",
+                "data": json.dumps({
+                    "agent": "ORACLE",
+                    "agent_id": "design_ops_manager",
+                    "agent_name": "Atlas",
+                    "status": "thinking",
+                }),
+            }
 
         # Run the crew in a thread to avoid blocking
         try:
@@ -129,27 +139,27 @@ async def run_crew(request: Request):
             # CrewAI returns the final output as a string
             # We'll structure it as agent messages
 
-            # Oracle's brief message
-            yield {
-                "event": "agent_message",
-                "data": json.dumps({
-                    "from": "design_ops_manager",
-                    "from_name": "Atlas",
-                    "to": "research_synthesizer",
-                    "subject": f"Research brief: {prompt[:80]}",
-                    "priority": "standard",
-                    "confidence": "n/a",
-                    "assumptions": "Based on available evidence in the workspace and the objectives selected for this run.",
-                    "body": (
-                        f"Directing Beacon to analyze: {prompt}\n\n"
-                        f"MODE: {mode.replace('_', ' ')}\n\n"
-                        f"READINESS: Atlas has framed the brief and scoped the evidence request.\n\n"
-                        f"WHAT WOULD IMPROVE CONFIDENCE: If the evidence is thin, Beacon should surface the next 1-3 signals worth gathering."
-                    ),
-                    "next_step": "Meridian to pull evidence and synthesize",
-                    "timestamp": datetime.now().isoformat(),
-                }),
-            }
+            if mode != "quick_read":
+                yield {
+                    "event": "agent_message",
+                    "data": json.dumps({
+                        "from": "design_ops_manager",
+                        "from_name": "Atlas",
+                        "to": "research_synthesizer",
+                        "subject": f"Research brief: {prompt[:80]}",
+                        "priority": "standard",
+                        "confidence": "n/a",
+                        "assumptions": "Based on available evidence in the workspace and the objectives selected for this run.",
+                        "body": (
+                            f"Directing Beacon to analyze: {prompt}\n\n"
+                            f"MODE: {mode.replace('_', ' ')}\n\n"
+                            f"READINESS: Atlas has framed the brief and scoped the evidence request.\n\n"
+                            f"WHAT WOULD IMPROVE CONFIDENCE: If the evidence is thin, Beacon should surface the next 1-3 signals worth gathering."
+                        ),
+                        "next_step": "Meridian to pull evidence and synthesize",
+                        "timestamp": datetime.now().isoformat(),
+                    }),
+                }
 
             # Meridian's synthesis message (the actual crew output)
             yield {
@@ -168,29 +178,29 @@ async def run_crew(request: Request):
                 }),
             }
 
-            # Oracle's final summary
-            yield {
-                "event": "agent_message",
-                "data": json.dumps({
-                    "from": "design_ops_manager",
-                    "from_name": "Atlas",
-                    "to": "user",
-                    "subject": "Synthesis complete — review recommendations",
-                    "priority": "standard",
-                    "confidence": beacon_confidence,
-                    "assumptions": (
-                        "Recommendations are directional and should be weighed against the available evidence "
-                        "and any assumptions surfaced in the synthesis."
-                    ),
-                    "body": (
-                        "Beacon has completed the synthesis.\n\n"
-                        f"READINESS: {beacon_readiness or 'Use the confidence and assumptions sections to judge whether the evidence is strong enough to act on now.'}\n\n"
-                        f"WHAT WOULD IMPROVE CONFIDENCE: {beacon_additional_signals or 'Use the additional signals section in the synthesis to identify the next best evidence to gather.'}"
-                    ),
-                    "next_step": beacon_next_step,
-                    "timestamp": datetime.now().isoformat(),
-                }),
-            }
+            if mode != "quick_read":
+                yield {
+                    "event": "agent_message",
+                    "data": json.dumps({
+                        "from": "design_ops_manager",
+                        "from_name": "Atlas",
+                        "to": "user",
+                        "subject": "Synthesis complete — review recommendations",
+                        "priority": "standard",
+                        "confidence": beacon_confidence,
+                        "assumptions": (
+                            "Recommendations are directional and should be weighed against the available evidence "
+                            "and any assumptions surfaced in the synthesis."
+                        ),
+                        "body": (
+                            "Beacon has completed the synthesis.\n\n"
+                            f"READINESS: {beacon_readiness or 'Use the confidence and assumptions sections to judge whether the evidence is strong enough to act on now.'}\n\n"
+                            f"WHAT WOULD IMPROVE CONFIDENCE: {beacon_additional_signals or 'Use the additional signals section in the synthesis to identify the next best evidence to gather.'}"
+                        ),
+                        "next_step": beacon_next_step,
+                        "timestamp": datetime.now().isoformat(),
+                    }),
+                }
 
             # Send completion event
             yield {

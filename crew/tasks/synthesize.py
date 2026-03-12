@@ -7,6 +7,7 @@ def create_synthesize_task(
     objectives: list[dict],
     evidence_text: str,
     mode_guidance: str,
+    mode: str = "quick_read",
 ) -> Task:
     objectives_text = "\n".join(
         f"- {obj.get('title', '')}\n"
@@ -20,6 +21,42 @@ def create_synthesize_task(
         f"  Owner: {obj.get('owner', '')}"
         for obj in objectives
     ) or "No specific objectives defined."
+
+    expected_output = (
+        "A structured synthesis that includes:\n"
+        "- SUBJECT: one-line summary of the key finding\n"
+        "- DETAILS: one short paragraph giving the important context behind the summary\n"
+        "- CONFIDENCE: high / medium / low\n"
+        "- READINESS: sufficient / partial / weak, with one sentence explaining why\n"
+        "- TOP FINDINGS: the top 3 most important observations in short, scannable bullets\n"
+        "- TOP NEEDS: the top 3 additional signals, risks, or validation needs in short, scannable bullets\n"
+        "- RECOMMENDATION: the clearest move to make now, tied to a segment + metric + stage\n"
+        "- ASSUMPTIONS: what this analysis takes as given\n"
+        "- FINDINGS: 2-5 key patterns found in the evidence, each with:\n"
+        "  - Pattern description\n"
+        "  - Evidence references (which observations, sessions, or votes support this)\n"
+        "  - Segment relevance\n"
+        "  - Lifecycle cohort relevance\n"
+        "  - Confidence level for this specific pattern\n"
+        "- OBJECTIVE MAPPING: how findings connect to each business objective\n"
+        "- GROWTH STAGE: which phase of the company strategy this supports\n"
+        "- ADDITIONAL SIGNALS WORTH GATHERING: 1-3 specific missing inputs, why each matters, and likely source\n"
+        "- RECOMMENDATIONS: 1-3 concrete design recommendations, each tied to a specific objective\n"
+        "- NEXT STEPS: what should happen next to validate or act on these findings"
+    )
+
+    if mode == "quick_read":
+        expected_output = (
+            "A fast, scannable synthesis that includes only:\n"
+            "- SUBJECT: one-line summary of the key finding\n"
+            "- DETAILS: one short paragraph of context\n"
+            "- CONFIDENCE: high / medium / low\n"
+            "- READINESS: sufficient / partial / weak, with one sentence explaining why\n"
+            "- TOP FINDINGS: the top 3 most important observations in short bullets\n"
+            "- TOP NEEDS: the top 3 missing signals, risks, or validation needs in short bullets\n"
+            "- RECOMMENDATION: the clearest move to make now, tied to a segment + metric + stage\n"
+            "- NEXT STEP: the most useful immediate action"
+        )
 
     return Task(
         description=(
@@ -48,24 +85,6 @@ def create_synthesize_task(
             f"- Always include the next 1-3 signals that would most improve confidence.\n"
             f"- Do not call external tools. Work only with the evidence provided in this prompt."
         ),
-        expected_output=(
-            "A structured synthesis that includes:\n"
-            "- SUBJECT: one-line summary of the key finding\n"
-            "- CONFIDENCE: high / medium / low\n"
-            "- READINESS: sufficient / partial / weak, with one sentence explaining why\n"
-            "- RECOMMENDATION: the clearest move to make now, tied to a segment + metric + stage\n"
-            "- ASSUMPTIONS: what this analysis takes as given\n"
-            "- FINDINGS: 2-5 key patterns found in the evidence, each with:\n"
-            "  - Pattern description\n"
-            "  - Evidence references (which observations, sessions, or votes support this)\n"
-            "  - Segment relevance\n"
-            "  - Lifecycle cohort relevance\n"
-            "  - Confidence level for this specific pattern\n"
-            "- OBJECTIVE MAPPING: how findings connect to each business objective\n"
-            "- GROWTH STAGE: which phase of the company strategy this supports\n"
-            "- ADDITIONAL SIGNALS WORTH GATHERING: 1-3 specific missing inputs, why each matters, and likely source\n"
-            "- RECOMMENDATIONS: 1-3 concrete design recommendations, each tied to a specific objective\n"
-            "- NEXT STEPS: what should happen next to validate or act on these findings"
-        ),
+        expected_output=expected_output,
         agent=agent,
     )

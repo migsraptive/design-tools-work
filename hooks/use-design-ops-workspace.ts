@@ -18,6 +18,7 @@ export function useDesignOpsWorkspace() {
   const [running, setRunning] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState<DesignOpsStep>("objective");
+  const [currentRunMode, setCurrentRunMode] = useState<SynthesisMode>("decision_memo");
   const pendingObjectiveDeletes = useRef<Map<string, ReturnType<typeof setTimeout>>>(
     new Map()
   );
@@ -236,12 +237,14 @@ export function useDesignOpsWorkspace() {
     running,
     loading,
     activeStep,
+    currentRunMode,
     canOpenSynthesis,
     canOpenFindings,
     setActiveObjectiveId,
     setMessages,
     setRunning,
     setActiveStep,
+    setCurrentRunMode,
     addObjective,
     updateObjective,
     deleteObjective,

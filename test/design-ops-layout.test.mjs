@@ -54,6 +54,7 @@ test("design ops layout uses stacked rows with a separate objectives section", (
   assert.match(objectiveFields, /Lifecycle cohorts/);
   assert.match(objectiveFields, /DesignOpsMultiSelect/);
   assert.doesNotMatch(objectiveFields, /grid gap-2 md:grid-cols-2/);
+  assert.doesNotMatch(objectiveFields, /sm:grid-cols-2/);
   assert.match(objectiveFields, /Choose one or more segments/);
   assert.match(objectiveFields, /Choose one or more cohorts/);
   assert.match(multiSelect, /PopoverTrigger/);

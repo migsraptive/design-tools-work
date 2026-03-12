@@ -51,18 +51,27 @@ test("design ops client archives completed runs and renders a findings archive",
 
 test("design ops timeline uses labeled token-scale sections for synthesis output", () => {
   const timeline = read("components/design/design-ops-timeline.tsx");
+  const findingDialog = read("components/design/design-ops-finding-dialog.tsx");
   const formatting = read("lib/design-ops-formatting.ts");
 
   assert.match(formatting, /export function formatPlainTextSections/);
   assert.match(formatting, /FINDINGS|RECOMMENDATIONS|ASSUMPTIONS|SUBJECT/);
+  assert.match(formatting, /TOP FINDINGS/);
+  assert.match(formatting, /TOP NEEDS/);
   assert.match(formatting, /"Summary"/);
   assert.match(formatting, /"Details"/);
+  assert.match(formatting, /"Top findings"/);
+  assert.match(formatting, /"Top needs"/);
   assert.match(timeline, /function isProcessMessage/);
   assert.match(timeline, /formatPlainTextSections\(msg\.body\)/);
   assert.match(timeline, /Process details/);
   assert.match(timeline, /Analyzing objective/);
+  assert.match(timeline, /View/);
+  assert.match(timeline, /Top 3 findings/);
+  assert.match(timeline, /Top 3 needs/);
+  assert.match(timeline, /DesignOpsFindingDialog/);
   assert.match(timeline, /synthesisMessages\.length === 0/);
-  assert.match(timeline, /Assumptions/);
-  assert.match(timeline, /text-\[10px\] font-semibold uppercase tracking-\[0\.16em\] text-muted-foreground/);
-  assert.match(timeline, /text-sm leading-6 text-foreground\/85/);
+  assert.match(findingDialog, /Assumptions/);
+  assert.match(findingDialog, /Next step/);
+  assert.match(findingDialog, /Detailed synthesis view/);
 });

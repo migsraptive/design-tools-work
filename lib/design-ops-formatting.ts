@@ -18,9 +18,12 @@ export interface PlainTextSection {
 
 const INLINE_SECTION_MARKERS = [
   "SUBJECT",
+  "CONFIDENCE",
   "READINESS",
   "OBJECTIVE",
   "ANALYSIS",
+  "TOP FINDINGS",
+  "TOP NEEDS",
   "WHAT WE HAVE",
   "WHAT WOULD IMPROVE CONFIDENCE",
   "ADDITIONAL SIGNALS WORTH GATHERING",
@@ -41,9 +44,13 @@ const INLINE_SECTION_MARKERS = [
 
 function normalizeSectionLabel(label: string): string {
   const normalized = label.toLowerCase();
+  if (normalized === "subject") return "Summary";
+  if (normalized === "confidence") return "Confidence";
   if (normalized === "analysis" || normalized === "summary") return "Summary";
   if (normalized === "readiness") return "Readiness";
   if (normalized === "objective") return "Objective";
+  if (normalized === "top findings") return "Top findings";
+  if (normalized === "top needs") return "Top needs";
   if (normalized === "what we have") return "Available inputs";
   if (normalized === "what would improve confidence") {
     return "Additional signals";

@@ -144,7 +144,7 @@ export function DesignOpsArchiveList({
                       synthesis without rerunning Atlas and Beacon.
                     </p>
                   </div>
-                  <DesignOpsTimeline messages={archive.messages} />
+                  <DesignOpsTimeline messages={archive.messages} mode={archive.mode} />
                 </CardContent>
               )}
             </Card>

@@ -29,18 +29,26 @@ test("design ops runner renders a single active objective with mode-based synthe
   const activeObjectiveSummary = read(
     "components/design/design-ops-active-objective-summary.tsx"
   );
+  const prompts = read("lib/design-ops-prompts.ts");
   const crewMain = read("crew/main.py");
   const crewLogic = read("crew/crew.py");
   const formatting = read("lib/design-ops-formatting.ts");
 
   assert.match(runner, /providerName = health\?\.provider === "openai" \? "OpenAI" : "model provider"/);
-  assert.match(runner, /const \[mode, setMode\] = useState<SynthesisMode>\("quick_read"\)/);
+  assert.match(runner, /const \[mode, setMode\] = useState<SynthesisMode>\("decision_memo"\)/);
   assert.match(runner, /SYNTHESIS_MODES/);
   assert.match(runner, /Synthesis depth/);
+  assert.match(runner, /Use recommended prompt/);
+  assert.match(runner, /Deep dive reference prompt/);
+  assert.match(runner, /getModePromptGuidance/);
+  assert.match(runner, /buildRecommendedPrompt/);
   assert.match(runner, /Run \{\s*SYNTHESIS_MODES\.find/);
   assert.match(runner, /mode,/);
   assert.match(runner, /DesignOpsActiveObjectiveSummary/);
   assert.match(activeObjectiveSummary, /Active objective/);
+  assert.match(prompts, /buildRecommendedPrompt/);
+  assert.match(prompts, /buildDeepDiveReferencePrompt/);
+  assert.match(prompts, /getModePromptGuidance/);
   assert.match(runner, /Create or load an objective first/);
   assert.match(runner, /objectives: \[objective\]/);
   assert.match(runner, /currentEvent === "run_start"/);
@@ -63,11 +71,17 @@ test("design ops runner renders a single active objective with mode-based synthe
   assert.match(crewMain, /extract_confidence/);
   assert.match(crewMain, /mode = body\.get\("mode", "quick_read"\)/);
   assert.match(crewMain, /"mode": mode/);
+  assert.match(crewMain, /if mode == "quick_read":/);
+  assert.match(crewMain, /"agent": "MERIDIAN"/);
   assert.match(crewMain, /ADDITIONAL SIGNALS WORTH GATHERING/);
   assert.match(crewMain, /WHAT WOULD IMPROVE CONFIDENCE/);
   assert.match(crewMain, /beacon_readiness/);
   assert.match(crewMain, /beacon_next_step/);
   assert.match(crewLogic, /def get_mode_guidance/);
+  assert.match(crewLogic, /session_limit = 3/);
+  assert.match(crewLogic, /observation_limit = 6/);
+  assert.match(crewLogic, /include_comments = False/);
+  assert.match(crewLogic, /agents=\[meridian\]/);
   assert.match(crewLogic, /SYNTHESIS MODE: Quick read/);
   assert.match(crewLogic, /SYNTHESIS MODE: Decision memo/);
   assert.match(crewLogic, /SYNTHESIS MODE: Deep dive/);
@@ -87,4 +101,8 @@ test("design ops runner renders a single active objective with mode-based synthe
   assert.match(read("crew\/tasks\/synthesize.py"), /GROWTH STAGE:/);
   assert.match(read("crew\/tasks\/synthesize.py"), /ADDITIONAL SIGNALS WORTH GATHERING:/);
   assert.match(read("crew\/tasks\/synthesize.py"), /READINESS:/);
+  assert.match(read("crew\/tasks\/synthesize.py"), /if mode == "quick_read":/);
+  assert.match(read("crew\/tools\/supabase_tool.py"), /session_limit: int = 6/);
+  assert.match(read("crew\/tools\/supabase_tool.py"), /observation_limit: int = 12/);
+  assert.match(read("crew\/tools\/supabase_tool.py"), /include_comments: bool = True/);
 });

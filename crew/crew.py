@@ -53,28 +53,58 @@ def get_llm() -> LLM:
 def run_crew(prompt: str, objectives: list[dict], mode: str = "quick_read") -> str:
     llm = get_llm()
     evidence_topic = prompt[:160]
+    evidence_days = 30
+    session_limit = 6
+    observation_limit = 12
+    include_comments = True
+
+    if mode == "quick_read":
+        evidence_days = 14
+        session_limit = 3
+        observation_limit = 6
+        include_comments = False
+
+    if mode == "decision_memo":
+        evidence_days = 21
+        session_limit = 4
+        observation_limit = 8
+
     try:
-        evidence_text = fetch_evidence.run(topic=evidence_topic, days=30)
+        evidence_text = fetch_evidence.run(
+            topic=evidence_topic,
+            days=evidence_days,
+            session_limit=session_limit,
+            observation_limit=observation_limit,
+            include_comments=include_comments,
+        )
     except Exception as error:
         evidence_text = (
             "Evidence fetch failed. Treat the data as thin and state assumptions explicitly.\n"
             f"Fetch error: {error}"
         )
 
-    oracle = create_oracle(llm)
     meridian = create_meridian(llm)
-
     mode_guidance = get_mode_guidance(mode)
-
-    brief_task = create_frame_brief_task(oracle, prompt, objectives, mode_guidance)
-    synth_task = create_synthesize_task(meridian, prompt, objectives, evidence_text, mode_guidance)
-
-    crew = Crew(
-        agents=[oracle, meridian],
-        tasks=[brief_task, synth_task],
-        process=Process.sequential,
-        verbose=True,
+    synth_task = create_synthesize_task(
+        meridian, prompt, objectives, evidence_text, mode_guidance, mode
     )
+
+    if mode == "quick_read":
+        crew = Crew(
+            agents=[meridian],
+            tasks=[synth_task],
+            process=Process.sequential,
+            verbose=True,
+        )
+    else:
+        oracle = create_oracle(llm)
+        brief_task = create_frame_brief_task(oracle, prompt, objectives, mode_guidance)
+        crew = Crew(
+            agents=[oracle, meridian],
+            tasks=[brief_task, synth_task],
+            process=Process.sequential,
+            verbose=True,
+        )
 
     result = crew.kickoff()
     return str(result)
