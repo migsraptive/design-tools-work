@@ -10,6 +10,7 @@ import { useAdmin } from "@/hooks/use-admin";
 import { generateId } from "@/lib/design-utils";
 import type { MediaType, SessionValidation } from "@/lib/design-types";
 import { OptionForm } from "@/components/design/option-form";
+import { LiveDraftHeaderFields } from "@/components/design/live-draft-header-fields";
 import { SessionBriefInputs } from "@/components/design/session-brief-inputs";
 import { SessionValidationFields } from "@/components/design/session-validation-fields";
 import {
@@ -24,7 +25,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 interface OptionDraft {
   key: string;
@@ -197,27 +197,20 @@ export function CreateSessionDialog({ children }: { children: React.ReactNode })
         {/* ── Step 1: Setup ──────────────────────────────────── */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="session-title">What are you exploring?</Label>
-              <Input
-                id="session-title"
-                placeholder="e.g. Homepage hero redesign"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                autoFocus
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="session-desc">Description</Label>
-              <Textarea
-                id="session-desc"
-                placeholder="Proposed solution or concept summary for voters..."
-                rows={2}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
+            <LiveDraftHeaderFields
+              titleId="session-title"
+              descriptionId="session-desc"
+              titleLabel="What are you exploring?"
+              descriptionLabel="Description"
+              titlePlaceholder="e.g. Homepage hero redesign"
+              descriptionPlaceholder="Proposed solution or concept summary for voters..."
+              titleValue={title}
+              descriptionValue={description}
+              onTitleChange={setTitle}
+              onDescriptionChange={setDescription}
+              density="form"
+              autoFocus
+            />
 
             <div className="flex gap-4">
               <div className="flex-1 space-y-2">

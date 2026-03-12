@@ -19,6 +19,7 @@ import { generateId } from "@/lib/design-utils";
 import type { MediaType, SessionValidation } from "@/lib/design-types";
 import { Button } from "@/components/ui/button";
 import { DraftOptionCard } from "@/components/design/draft-option-card";
+import { LiveDraftHeaderFields } from "@/components/design/live-draft-header-fields";
 import { SessionBriefInputs } from "@/components/design/session-brief-inputs";
 import { SessionValidationFields } from "@/components/design/session-validation-fields";
 
@@ -136,20 +137,22 @@ export default function NewSessionPage() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           <div className="space-y-1 flex-1 min-w-0">
-            <input
-              type="text"
-              placeholder="Session title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+            <LiveDraftHeaderFields
+              titleId="new-session-title"
+              descriptionId="new-session-description"
+              titleLabel="Session title"
+              descriptionLabel="Description"
+              titlePlaceholder="Session title..."
+              descriptionPlaceholder="Proposed solution or concept summary for voters..."
+              titleValue={title}
+              descriptionValue={description}
+              onTitleChange={setTitle}
+              onDescriptionChange={setDescription}
+              descriptionRows={1}
+              labelMode="sr-only"
+              density="inline"
+              emphasis="hero"
               autoFocus
-              className="text-2xl font-bold tracking-tight bg-transparent border-none outline-none placeholder:text-muted-foreground/40 w-full"
-            />
-            <textarea
-              placeholder="Proposed solution or concept summary for voters..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={1}
-              className="text-muted-foreground bg-transparent border-none outline-none placeholder:text-muted-foreground/40 w-full resize-none text-base"
             />
           </div>
         </div>

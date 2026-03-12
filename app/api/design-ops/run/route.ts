@@ -4,7 +4,7 @@ const CREW_API_URL = process.env.CREW_API_URL || "http://127.0.0.1:8000";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { prompt, objectives } = body;
+  const { prompt, objectives, mode } = body;
 
   if (!prompt) {
     return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const res = await fetch(`${CREW_API_URL}/run`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, objectives }),
+      body: JSON.stringify({ prompt, objectives, mode }),
     });
 
     if (!res.ok) {

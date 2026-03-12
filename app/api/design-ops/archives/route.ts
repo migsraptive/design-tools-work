@@ -27,7 +27,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { prompt, objectives, messages, provider, model } = body;
+  const { prompt, mode, objectives, messages, provider, model } = body;
 
   if (!prompt || !Array.isArray(messages) || messages.length === 0) {
     return NextResponse.json(
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
   const newArchive: DesignOpsArchive = {
     id: crypto.randomUUID(),
     prompt,
+    mode: mode || "quick_read",
     objectives: Array.isArray(objectives) ? objectives : [],
     messages,
     provider: provider || "",
@@ -51,4 +52,23 @@ export async function POST(request: Request) {
   await writeArchives(archives);
 
   return NextResponse.json(newArchive, { status: 201 });
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "id is required" }, { status: 400 });
+  }
+
+  const archives = await readArchives();
+  const filtered = archives.filter((archive) => archive.id !== id);
+
+  if (filtered.length === archives.length) {
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  }
+
+  await writeArchives(filtered);
+  return NextResponse.json({ ok: true });
 }

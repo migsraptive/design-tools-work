@@ -5,6 +5,28 @@ from tasks import create_frame_brief_task, create_synthesize_task
 from tools import fetch_evidence
 
 
+def get_mode_guidance(mode: str) -> str:
+    if mode == "deep_dive":
+        return (
+            "SYNTHESIS MODE: Deep dive.\n"
+            "- Go broad enough to cover major tradeoffs and scenarios.\n"
+            "- Include richer objective mapping, risks, and evidence gaps.\n"
+            "- Spend more attention on readiness and additional signals.\n"
+        )
+    if mode == "decision_memo":
+        return (
+            "SYNTHESIS MODE: Decision memo.\n"
+            "- Produce a balanced output with recommendation, rationale, alternatives, and risks.\n"
+            "- Keep it concise enough for a product review artifact.\n"
+        )
+    return (
+        "SYNTHESIS MODE: Quick read.\n"
+        "- Optimize for speed and scannability.\n"
+        "- Lead with the clearest recommendation, confidence, assumptions, and next step.\n"
+        "- Keep findings tight and avoid long evidence dumps.\n"
+    )
+
+
 def get_llm() -> LLM:
     import os
     provider = os.environ.get("CREW_MODEL_PROVIDER", "openai")
@@ -28,7 +50,7 @@ def get_llm() -> LLM:
     return LLM(**kwargs)
 
 
-def run_crew(prompt: str, objectives: list[dict]) -> str:
+def run_crew(prompt: str, objectives: list[dict], mode: str = "quick_read") -> str:
     llm = get_llm()
     evidence_topic = prompt[:160]
     try:
@@ -42,8 +64,10 @@ def run_crew(prompt: str, objectives: list[dict]) -> str:
     oracle = create_oracle(llm)
     meridian = create_meridian(llm)
 
-    brief_task = create_frame_brief_task(oracle, prompt, objectives)
-    synth_task = create_synthesize_task(meridian, prompt, objectives, evidence_text)
+    mode_guidance = get_mode_guidance(mode)
+
+    brief_task = create_frame_brief_task(oracle, prompt, objectives, mode_guidance)
+    synth_task = create_synthesize_task(meridian, prompt, objectives, evidence_text, mode_guidance)
 
     crew = Crew(
         agents=[oracle, meridian],

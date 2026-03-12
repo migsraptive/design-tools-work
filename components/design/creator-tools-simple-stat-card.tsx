@@ -1,3 +1,5 @@
+import { creatorToolsInsetSurfaceClass } from "@/lib/creator-tools-surfaces";
+
 export function CreatorToolsSimpleStatCard({
   label,
   value,
@@ -8,7 +10,7 @@ export function CreatorToolsSimpleStatCard({
   detail: string;
 }) {
   return (
-    <div className="rounded-[24px] border border-border/60 bg-background/90 p-4">
+    <div className={creatorToolsInsetSurfaceClass}>
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </p>

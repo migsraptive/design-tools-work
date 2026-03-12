@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
+import { creatorToolsSectionSurfaceClass } from "@/lib/creator-tools-surfaces";
 import { cn } from "@/lib/utils";
 
 export function CreatorToolsSectionPanel({
@@ -13,7 +14,7 @@ export function CreatorToolsSectionPanel({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-[28px] border border-border/60 bg-background/90 p-5", className)}>
+    <div className={cn(creatorToolsSectionSurfaceClass, className)}>
       {(title || Icon) && (
         <div className="flex items-center gap-2">
           {Icon ? <Icon className="size-4 text-primary" /> : null}
@@ -22,7 +23,7 @@ export function CreatorToolsSectionPanel({
           </p>
         </div>
       )}
-      <div className="mt-5">{children}</div>
+      <div className="mt-4">{children}</div>
     </div>
   );
 }
